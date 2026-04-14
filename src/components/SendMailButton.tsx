@@ -261,7 +261,7 @@ export default function SendMailButton() {
           onClick={handleSend}
           disabled={isDisabled}
           className={`
-            w-[280px] py-4 text-[17px] font-semibold rounded-2xl
+            w-[420px] max-w-[calc(100vw-48px)] py-4 text-[17px] font-semibold rounded-2xl
             transition-all active:scale-[0.97]
             ${isDisabled
               ? "bg-[#d2d2d7] text-white cursor-not-allowed"
