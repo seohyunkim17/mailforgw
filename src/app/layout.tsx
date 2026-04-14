@@ -3,8 +3,7 @@ import { AuthProvider } from "@/components/AuthProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Mail for GW",
-  description: "랜덤 메일 발송기",
+  title: "mail to wakeone",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

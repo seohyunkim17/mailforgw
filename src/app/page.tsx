@@ -17,7 +17,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-4 gap-6">
-      <h1 className="text-2xl font-bold">Mail for GW</h1>
+      <h1 className="text-2xl font-bold">mail to wakeone</h1>
       {user ? (
         <>
           <div className="flex items-center gap-3">
