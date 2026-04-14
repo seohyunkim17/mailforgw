@@ -5,6 +5,7 @@ import { collection, getDocs, addDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { sendEmail } from "@/lib/gmail";
 import { useAuth } from "./AuthProvider";
+import Stats from "./Stats";
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -175,8 +176,11 @@ export default function SendMailButton() {
         <div className="
           fixed bottom-0 inset-x-0 pb-8 pt-4 bg-gradient-to-t from-[#fbfbfd] via-[#fbfbfd] to-transparent
           md:static md:bg-none md:pb-0 md:pt-6
-          flex flex-col items-center gap-3
+          flex flex-col items-center gap-4
         ">
+          <div className="md:hidden">
+            <Stats />
+          </div>
           <button
             onClick={handleSend}
             disabled={isDisabled}
