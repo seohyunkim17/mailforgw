@@ -24,9 +24,9 @@ body {
 }
 
 @keyframes toastSlide {
-  0% { opacity: 0; transform: translateY(-24px); }
-  25% { opacity: 1; transform: translateY(4px); }
-  35% { transform: translateY(0); }
-  65% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-10px); }
+  0% { opacity: 0; transform: translate(-50%, -24px); }
+  25% { opacity: 1; transform: translate(-50%, 4px); }
+  35% { transform: translate(-50%, 0); }
+  65% { opacity: 1; transform: translate(-50%, 0); }
+  100% { opacity: 0; transform: translate(-50%, -10px); }
 }
