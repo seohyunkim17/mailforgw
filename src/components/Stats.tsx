@@ -78,7 +78,7 @@ export default function Stats() {
           </div>
           <div className="flex flex-col items-center">
             <span className="text-[17px] font-semibold text-[#86868b]">{Math.max(500 - myCount, 0)}</span>
-            <span className="text-[#aeaeb2]">계정 하루 잔여</span>
+            <span className="text-[#aeaeb2]">내 1일 잔여</span>
           </div>
           <div className="flex flex-col items-center">
             <span className="text-[17px] font-semibold text-[#86868b]">{formatCount(totalCount)}</span>
