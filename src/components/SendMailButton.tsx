@@ -206,60 +206,65 @@ export default function SendMailButton() {
         </div>
       )}
 
-    <div className="w-full flex flex-col items-center gap-5">
-      {/* Preview card */}
-      {dataLoaded && previewSubject && previewBody && (
-        <div className="w-full max-w-[420px] bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] font-medium text-[#86868b] uppercase tracking-wide">
-              미리보기
-            </span>
-            <button
-              onClick={shuffle}
-              className="text-[12px] text-[#0071e3] hover:text-[#0077ED] font-medium transition-colors"
-            >
-              새로고침
-            </button>
+    <div className="w-full flex flex-col items-center">
+      {/* Preview card - scrollable area */}
+      <div className="w-full flex flex-col items-center gap-5 mb-8">
+        {dataLoaded && previewSubject && previewBody && (
+          <div className="w-full max-w-[420px] bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-[11px] font-medium text-[#86868b] uppercase tracking-wide">
+                미리보기
+              </span>
+              <button
+                onClick={shuffle}
+                className="text-[12px] text-[#0071e3] hover:text-[#0077ED] font-medium transition-colors"
+              >
+                새로고침
+              </button>
+            </div>
+            <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">
+              {previewSubject}
+            </p>
+            <p className="text-[13px] text-[#6e6e73] leading-relaxed whitespace-pre-wrap">
+              {previewBody}
+            </p>
           </div>
-          <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">
-            {previewSubject}
+        )}
+
+        {dataLoaded && !previewSubject && !previewBody && (
+          <p className="text-[13px] text-[#86868b]">
+            등록된 제목/내용이 없습니다.
           </p>
-          <p className="text-[13px] text-[#6e6e73] leading-relaxed whitespace-pre-wrap">
-            {previewBody}
-          </p>
-        </div>
-      )}
+        )}
+      </div>
 
-      {dataLoaded && !previewSubject && !previewBody && (
-        <p className="text-[13px] text-[#86868b]">
-          등록된 제목/내용이 없습니다.
-        </p>
-      )}
+      {/* Fixed bottom area - button + stats */}
+      <div className="fixed bottom-0 inset-x-0 pb-8 pt-4 bg-gradient-to-t from-[#fbfbfd] via-[#fbfbfd] to-transparent flex flex-col items-center gap-3">
+        <button
+          onClick={handleSend}
+          disabled={isDisabled}
+          className={`
+            w-[280px] py-4 text-[17px] font-semibold rounded-2xl
+            transition-all active:scale-[0.97]
+            ${isDisabled
+              ? "bg-[#d2d2d7] text-white cursor-not-allowed"
+              : "bg-[#1d1d1f] text-white hover:bg-[#000000]"
+            }
+          `}
+        >
+          {buttonLabel()}
+        </button>
 
-      <button
-        onClick={handleSend}
-        disabled={isDisabled}
-        className={`
-          w-full max-w-[280px] py-4 text-[17px] font-semibold rounded-2xl
-          transition-all active:scale-[0.97]
-          ${isDisabled
-            ? "bg-[#d2d2d7] text-white cursor-not-allowed"
-            : "bg-[#1d1d1f] text-white hover:bg-[#000000]"
-          }
-        `}
-      >
-        {buttonLabel()}
-      </button>
-
-      {user && myCount !== null && totalCount !== null && (
-        <div className="w-full max-w-[420px] flex items-center justify-center gap-5 text-[13px] text-[#86868b]">
-          <span>오늘 {myCount}건</span>
-          <span className="text-[#d2d2d7]">|</span>
-          <span>잔여 {Math.max(500 - myCount, 0)}건</span>
-          <span className="text-[#d2d2d7]">|</span>
-          <span>전체 {formatCount(totalCount)}건</span>
-        </div>
-      )}
+        {user && myCount !== null && totalCount !== null && (
+          <div className="flex items-center gap-5 text-[13px] text-[#86868b]">
+            <span>오늘 {myCount}건</span>
+            <span className="text-[#d2d2d7]">|</span>
+            <span>잔여 {Math.max(500 - myCount, 0)}건</span>
+            <span className="text-[#d2d2d7]">|</span>
+            <span>전체 {formatCount(totalCount)}건</span>
+          </div>
+        )}
+      </div>
     </div>
     </>
   );
