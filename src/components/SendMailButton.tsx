@@ -26,7 +26,6 @@ export interface SendMailHandle {
 
 const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref) {
   const { user, accessToken, login, logout } = useAuth();
-  const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [cooldown, setCooldown] = useState(0);
   const [sendCount, setSendCount] = useState(0);
