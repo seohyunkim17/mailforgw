@@ -174,12 +174,12 @@ export default function SendMailButton() {
     <>
       {/* Toast notification - fixed at top, no touch area, auto-dismiss */}
       {message && (
-        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none animate-[fadeInOut_5s_ease-in-out]">
+        <div className="fixed top-6 inset-x-0 z-50 pointer-events-none flex justify-center animate-[fadeInOut_5s_ease-in-out]">
           <div
-            className={`px-5 py-3 rounded-2xl text-[14px] font-medium backdrop-blur-xl shadow-lg ${
+            className={`px-5 py-3 rounded-2xl text-[14px] font-medium ${
               status === "success"
-                ? "bg-white/90 text-[#0071e3]"
-                : "bg-white/90 text-[#ff3b30]"
+                ? "bg-[#e8f0fe] text-[#0071e3]"
+                : "bg-[#ffeaea] text-[#ff3b30]"
             }`}
           >
             {status === "success" ? `\u2713 ${message}` : message}
