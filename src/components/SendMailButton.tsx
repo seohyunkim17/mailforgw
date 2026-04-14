@@ -129,12 +129,8 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
             const snap = await getDocs(myQ);
             if (snap.size >= 500) {
               setShowLimitPopup(true);
-            } else if (newCount % 100 === 0) {
-              setShowSwitchPopup(true);
             }
-          } catch {
-            if (newCount % 100 === 0) setShowSwitchPopup(true);
-          }
+          } catch { /* ignore */ }
         }
 
         setTimeout(() => { setStatus("idle"); }, 500);
