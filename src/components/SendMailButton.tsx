@@ -10,6 +10,15 @@ function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
+function formatCount(n: number): string {
+  if (n >= 10000) {
+    const man = Math.floor(n / 10000);
+    const rest = n % 10000;
+    return rest > 0 ? `${man}만 ${rest.toLocaleString()}` : `${man}만`;
+  }
+  return n.toLocaleString();
+}
+
 function getTodayMidnightKST(): Date {
   const now = new Date();
   const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
@@ -22,7 +31,8 @@ export default function SendMailButton() {
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const [cooldown, setCooldown] = useState(0);
-  const [todayCount, setTodayCount] = useState<number | null>(null);
+  const [myCount, setMyCount] = useState<number | null>(null);
+  const [totalCount, setTotalCount] = useState<number | null>(null);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Preview state
@@ -65,27 +75,33 @@ export default function SendMailButton() {
     if (allBodies.length > 0) setPreviewBody(pickRandom(allBodies));
   };
 
-  // Fetch today's send count (per user - Gmail limit is per account)
+  // Fetch send counts
   useEffect(() => {
     if (!user) {
-      setTodayCount(null);
+      setMyCount(null);
+      setTotalCount(null);
       return;
     }
-    const fetchCount = async () => {
+    const fetchCounts = async () => {
       try {
         const todayMidnight = getTodayMidnightKST();
-        const q = query(
+        // My today's count
+        const myQ = query(
           collection(db, "sendLogs"),
           where("userId", "==", user.uid),
           where("sentAt", ">=", Timestamp.fromDate(todayMidnight))
         );
-        const snap = await getDocs(q);
-        setTodayCount(snap.size);
+        // Total all-time count
+        const totalSnap = await getDocs(collection(db, "sendLogs"));
+        const mySnap = await getDocs(myQ);
+        setMyCount(mySnap.size);
+        setTotalCount(totalSnap.size);
       } catch {
-        setTodayCount(0);
+        setMyCount(0);
+        setTotalCount(0);
       }
     };
-    fetchCount();
+    fetchCounts();
   }, [user]);
 
   useEffect(() => {
@@ -139,7 +155,8 @@ export default function SendMailButton() {
               email: user.email,
               sentAt: Timestamp.now(),
             });
-            setTodayCount((prev) => (prev === null ? 1 : prev + 1));
+            setMyCount((prev) => (prev === null ? 1 : prev + 1));
+            setTotalCount((prev) => (prev === null ? 1 : prev + 1));
           } catch {
             // Non-critical
           }
@@ -233,10 +250,14 @@ export default function SendMailButton() {
         {buttonLabel()}
       </button>
 
-      {user && todayCount !== null && (
-        <p className="text-[13px] text-[#86868b]">
-          오늘 {todayCount}건 발송 · 잔여 {Math.max(500 - todayCount, 0)}건
-        </p>
+      {user && myCount !== null && totalCount !== null && (
+        <div className="w-full max-w-[420px] flex items-center justify-center gap-5 text-[13px] text-[#86868b]">
+          <span>오늘 {myCount}건</span>
+          <span className="text-[#d2d2d7]">|</span>
+          <span>잔여 {Math.max(500 - myCount, 0)}건</span>
+          <span className="text-[#d2d2d7]">|</span>
+          <span>전체 {formatCount(totalCount)}건</span>
+        </div>
       )}
     </div>
     </>

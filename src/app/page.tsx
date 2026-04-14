@@ -37,14 +37,6 @@ export default function Home() {
         )}
       </div>
 
-      <footer className="fixed bottom-5 right-5">
-        <a
-          href="/admin"
-          className="text-[11px] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
-        >
-          관리자
-        </a>
-      </footer>
     </main>
   );
 }
