@@ -165,18 +165,24 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
 
   return (
     <>
-      {/* Success toasts (multiple independent) */}
-      <div className="fixed top-6 inset-x-0 z-50 pointer-events-none flex flex-col items-center gap-2">
-        {toasts.map((id) => (
-          <div
-            key={id}
-            style={{ animation: "toastSlide 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards" }}
-          >
-            <div className="px-5 py-3 rounded-2xl text-[14px] font-medium bg-[#e8f0fe] text-[#0071e3]">
-              ✓ 발송 완료
+      {/* Success toasts - stacked at same position */}
+      <div className="fixed top-6 inset-x-0 z-50 pointer-events-none flex justify-center">
+        <div className="relative">
+          {toasts.map((id) => (
+            <div
+              key={id}
+              className="absolute top-0 left-1/2 -translate-x-1/2 whitespace-nowrap"
+              style={{ animation: "toastSlide 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards" }}
+            >
+              <div
+                className="px-5 py-3 rounded-2xl text-[14px] font-medium bg-[#e8f0fe] text-[#0071e3]"
+                style={{ boxShadow: "0 4px 16px rgba(0, 113, 227, 0.15), 0 0 0 1px rgba(0, 113, 227, 0.08)" }}
+              >
+                ✓ 발송 완료
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
 
       {/* Daily limit popup */}
