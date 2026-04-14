@@ -52,11 +52,11 @@ export default function Home() {
         </h1>
         {inApp ? (
           <div className="mt-6 text-center">
-            <p className="text-[14px] text-[#86868b] mb-1 leading-relaxed">
-              인앱 브라우저에서는 Google 로그인이<br />지원되지 않습니다.
+            <p className="text-[13px] text-[#86868b] mb-1">
+              인앱 브라우저에서는 Google 로그인이 지원되지 않습니다.
             </p>
-            <p className="text-[12px] text-[#aeaeb2] mb-5">
-              링크 복사 후 Chrome 또는 Safari로 접속해주세요.
+            <p className="text-[13px] text-[#aeaeb2] mb-5">
+              링크 복사 후 Chrome 혹은 Safari로 접속해주세요.
             </p>
             <button
               onClick={() => {
