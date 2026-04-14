@@ -73,13 +73,13 @@ export default function Home() {
         ) : (
           <div className="mt-8 flex flex-col items-center">
             <LoginButton />
-            <div className="mt-4">
+            <div className="mt-3">
               <MailtoFallback />
             </div>
-            <p className="mt-5 text-[12px] text-[#86868b] text-center">
+            <p className="mt-4 text-[11px] text-[#aeaeb2] text-center underline underline-offset-2">
               반드시 Safari, Chrome 등으로 접속해주세요 (트위터 X)
             </p>
-            <p className="mt-3 text-[11px] text-[#aeaeb2] text-center leading-relaxed">
+            <p className="mt-4 text-[11px] text-[#aeaeb2] text-center leading-relaxed">
               본 서비스는 개인 의견 전달을 위한 메일 간편 발송 서비스입니다.<br />로그인 시 이에 동의하며, 악의적으로 사용하지 않을 것을<br />약속하는 것으로 간주됩니다.
             </p>
           </div>
