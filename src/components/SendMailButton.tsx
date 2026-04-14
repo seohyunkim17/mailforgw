@@ -167,7 +167,7 @@ export default function SendMailButton() {
 
   const buttonLabel = () => {
     if (status === "sending") return "발송 중...";
-    if (cooldown > 0) return `${cooldown}초`;
+    if (cooldown > 0) return "대기 중";
     return "메일 보내기";
   };
 
@@ -175,7 +175,7 @@ export default function SendMailButton() {
     <div className="w-full flex flex-col items-center gap-5">
       {/* Preview card */}
       {dataLoaded && previewSubject && previewBody && (
-        <div className="w-full max-w-[340px] bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+        <div className="w-full max-w-[420px] bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
           <div className="flex items-center justify-between mb-3">
             <span className="text-[11px] font-medium text-[#86868b] uppercase tracking-wide">
               미리보기
@@ -206,7 +206,7 @@ export default function SendMailButton() {
         onClick={handleSend}
         disabled={isDisabled}
         className={`
-          w-full max-w-[280px] py-4 text-[17px] font-semibold rounded-2xl
+          w-full max-w-[420px] py-4 text-[17px] font-semibold rounded-2xl
           transition-all active:scale-[0.97]
           ${isDisabled
             ? "bg-[#d2d2d7] text-white cursor-not-allowed"
@@ -220,7 +220,7 @@ export default function SendMailButton() {
       {message && (
         <p
           className={`text-[13px] font-medium ${
-            status === "success" ? "text-[#34c759]" : "text-[#ff3b30]"
+            status === "success" ? "text-[#86868b]" : "text-[#ff3b30]"
           }`}
         >
           {message}

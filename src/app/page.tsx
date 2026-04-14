@@ -17,7 +17,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#fbfbfd]">
-      <div className="w-full max-w-sm flex flex-col items-center gap-8">
+      <div className="w-full max-w-md flex flex-col items-center gap-8">
         <div className="text-center">
           <h1 className="text-[28px] font-semibold tracking-tight text-[#1d1d1f]">
             mail to wakeone
