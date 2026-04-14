@@ -75,8 +75,11 @@ export default function Home() {
             </button>
           </div>
         ) : (
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col items-center">
             <LoginButton />
+            <p className="mt-4 text-[11px] text-[#aeaeb2] text-center leading-relaxed">
+              로그인 시 본 서비스를 악의적으로 사용하지 않을 것에<br />동의하는 것으로 간주됩니다.
+            </p>
           </div>
         )}
       </main>
