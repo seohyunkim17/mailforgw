@@ -176,7 +176,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
         >
           <div
             className="px-5 py-3 rounded-2xl text-[14px] font-medium bg-[#e8f0fe] text-[#0071e3]"
-            style={{ boxShadow: "0 4px 16px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04)" }}
+            style={{ boxShadow: "0 4px 16px rgba(0, 113, 227, 0.15), 0 0 0 1px rgba(0, 113, 227, 0.08)" }}
           >
             ✓ 발송 완료
           </div>
