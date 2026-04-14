@@ -62,7 +62,7 @@ function ItemManager({
             value={newText}
             onChange={(e) => setNewText(e.target.value)}
             placeholder={`새 ${title} 입력...`}
-            className="flex-1 px-4 py-3 text-[14px] bg-[#f5f5f7] rounded-xl border-none outline-none focus:ring-2 focus:ring-[#0071e3] placeholder:text-[#86868b] min-w-0 resize-none"
+            className="flex-1 px-4 py-3 text-[16px] bg-[#f5f5f7] rounded-xl border-none outline-none focus:ring-2 focus:ring-[#0071e3] placeholder:text-[#86868b] min-w-0 resize-none"
             rows={3}
           />
         ) : (
@@ -71,7 +71,7 @@ function ItemManager({
             onChange={(e) => setNewText(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={`새 ${title} 입력...`}
-            className="flex-1 px-4 py-3 text-[14px] bg-[#f5f5f7] rounded-xl border-none outline-none focus:ring-2 focus:ring-[#0071e3] placeholder:text-[#86868b] min-w-0"
+            className="flex-1 px-4 py-3 text-[16px] bg-[#f5f5f7] rounded-xl border-none outline-none focus:ring-2 focus:ring-[#0071e3] placeholder:text-[#86868b] min-w-0"
           />
         )}
         <button

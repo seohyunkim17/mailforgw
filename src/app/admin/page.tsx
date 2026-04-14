@@ -43,7 +43,7 @@ export default function AdminPage() {
           onChange={(e) => setPassword(e.target.value)}
           onKeyDown={handleKeyDown}
           placeholder="비밀번호"
-          className="w-full max-w-[280px] px-4 py-3 text-[15px] bg-[#f5f5f7] rounded-xl border-none outline-none focus:ring-2 focus:ring-[#0071e3] placeholder:text-[#86868b]"
+          className="w-full max-w-[280px] px-4 py-3 text-[16px] bg-[#f5f5f7] rounded-xl border-none outline-none focus:ring-2 focus:ring-[#0071e3] placeholder:text-[#86868b]"
         />
         <button
           onClick={handleLogin}
