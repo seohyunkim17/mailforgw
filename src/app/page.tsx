@@ -76,10 +76,10 @@ export default function Home() {
             <div className="mt-3 w-full">
               <MailtoFallback />
             </div>
-            <p className="mt-4 text-[11px] text-[#86868b] text-center underline underline-offset-2">
+            <p className="mt-4 text-[11px] text-[#4b4b4b] text-center underline underline-offset-2">
               반드시 Safari, Chrome 등으로 접속해주세요 (트위터 X)
             </p>
-            <p className="mt-4 text-[11px] text-[#aeaeb2] text-center leading-relaxed">
+            <p className="mt-2 text-[11px] text-[#aeaeb2] text-center leading-relaxed">
               본 서비스는 개인 의견 전달을 위한 메일 간편 발송 서비스입니다.<br />로그인 시 이에 동의하며, 악의적으로 사용하지 않을 것을<br />약속하는 것으로 간주됩니다.
             </p>
           </div>
