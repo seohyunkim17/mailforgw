@@ -263,7 +263,7 @@ export default function SendMailButton() {
             </div>
             <div className="flex flex-col items-center">
               <span className="text-[18px] font-semibold text-[#1d1d1f]">{Math.max(500 - myCount, 0)}</span>
-              <span className="text-[#86868b]">잔여</span>
+              <span className="text-[#86868b]">내 잔여</span>
             </div>
             <div className="flex flex-col items-center">
               <span className="text-[18px] font-semibold text-[#0071e3]">{formatCount(totalCount)}</span>
