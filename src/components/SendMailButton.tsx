@@ -159,7 +159,7 @@ export default function SendMailButton() {
     setTimeout(() => {
       setStatus("idle");
       setMessage("");
-    }, 5000);
+    }, 2500);
   };
 
   const isDisabled = status === "sending" || cooldown > 0;
@@ -174,7 +174,7 @@ export default function SendMailButton() {
     <>
       {/* Toast notification - fixed at top, no touch area, auto-dismiss */}
       {message && (
-        <div className="fixed top-6 inset-x-0 z-50 pointer-events-none flex justify-center animate-[fadeInOut_5s_ease-in-out]">
+        <div className="fixed top-6 inset-x-0 z-50 pointer-events-none flex justify-center animate-[fadeInOut_2.5s_ease-in-out]">
           <div
             className={`px-5 py-3 rounded-2xl text-[14px] font-medium ${
               status === "success"
