@@ -19,7 +19,8 @@ export default function Home() {
   return (
     <main className="min-h-screen flex flex-col items-center bg-[#fbfbfd] px-6 pt-20 pb-48 md:justify-center md:pt-0 md:pb-0">
       <div className="w-full max-w-[420px] flex flex-col items-center gap-6">
-        {user && <Stats />}
+        {/* Mobile: stats above title */}
+        {user && <div className="md:hidden"><Stats /></div>}
 
         <div className="text-center">
           <h1 className="text-[28px] font-semibold tracking-tight text-[#1d1d1f]">
@@ -35,7 +36,11 @@ export default function Home() {
         </div>
 
         {user ? (
-          <SendMailButton />
+          <>
+            <SendMailButton />
+            {/* PC: stats below button */}
+            <div className="hidden md:block"><Stats /></div>
+          </>
         ) : (
           <div className="mt-8">
             <LoginButton />
