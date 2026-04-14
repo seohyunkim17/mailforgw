@@ -43,7 +43,7 @@ export default function MailtoFallback() {
     <button
       onClick={handleClick}
       disabled={loading}
-      className="w-full max-w-[280px] px-6 py-3 bg-[#86868b] text-white text-[15px] font-medium rounded-xl hover:bg-[#6e6e73] active:scale-[0.98] transition-all disabled:opacity-50"
+      className="w-full max-w-[280px] px-6 py-3 bg-[#f0f0f5] text-[#86868b] text-[15px] font-medium rounded-xl hover:bg-[#e8e8ed] active:scale-[0.98] transition-all disabled:opacity-50"
     >
       {loading ? "불러오는 중..." : "로그인 불가 시 클릭"}
     </button>
