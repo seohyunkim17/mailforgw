@@ -164,7 +164,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
               다른 계정으로 전환할까요?
             </p>
             <p className="text-[13px] text-[#86868b] mb-5">
-              10건 발송했습니다. 다른 계정으로 로그인하면 더 많이 보낼 수 있어요.
+              10건 발송했습니다.<br />메일 주소 차단 방지를 위해 새 로그인을 권장합니다.
             </p>
             <div className="flex flex-col gap-2">
               <button
