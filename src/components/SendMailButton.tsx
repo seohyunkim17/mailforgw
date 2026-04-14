@@ -160,7 +160,7 @@ export default function SendMailButton() {
     setTimeout(() => {
       setStatus("idle");
       setMessage("");
-    }, 3000);
+    }, 5000);
   };
 
   const isDisabled = status === "sending" || cooldown > 0;
@@ -206,7 +206,7 @@ export default function SendMailButton() {
         onClick={handleSend}
         disabled={isDisabled}
         className={`
-          w-full max-w-[420px] py-4 text-[17px] font-semibold rounded-2xl
+          w-full max-w-[280px] py-4 text-[17px] font-semibold rounded-2xl
           transition-all active:scale-[0.97]
           ${isDisabled
             ? "bg-[#d2d2d7] text-white cursor-not-allowed"
@@ -218,13 +218,15 @@ export default function SendMailButton() {
       </button>
 
       {message && (
-        <p
-          className={`text-[13px] font-medium ${
-            status === "success" ? "text-[#86868b]" : "text-[#ff3b30]"
+        <div
+          className={`px-5 py-3 rounded-xl text-[14px] font-medium ${
+            status === "success"
+              ? "bg-[#e8f5e9] text-[#1b5e20]"
+              : "bg-[#ffeaea] text-[#ff3b30]"
           }`}
         >
-          {message}
-        </p>
+          {status === "success" ? `\u2713 ${message}` : message}
+        </div>
       )}
 
       {user && todayCount !== null && (
