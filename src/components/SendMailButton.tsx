@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import { collection, getDocs, addDoc, query, where, Timestamp } from "firebase/firestore";
+import { collection, getDocs, addDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { sendEmail } from "@/lib/gmail";
 import { useAuth } from "./AuthProvider";
@@ -10,39 +10,19 @@ function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-function formatCount(n: number): string {
-  if (n >= 10000) {
-    const man = Math.floor(n / 10000);
-    const rest = n % 10000;
-    return rest > 0 ? `${man}만 ${rest.toLocaleString()}` : `${man}만`;
-  }
-  return n.toLocaleString();
-}
-
-function getTodayMidnightKST(): Date {
-  const now = new Date();
-  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
-  kst.setUTCHours(0, 0, 0, 0);
-  return new Date(kst.getTime() - 9 * 60 * 60 * 1000);
-}
-
 export default function SendMailButton() {
   const { user, accessToken, login } = useAuth();
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
   const [cooldown, setCooldown] = useState(0);
-  const [myCount, setMyCount] = useState<number | null>(null);
-  const [totalCount, setTotalCount] = useState<number | null>(null);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Preview state
   const [allSubjects, setAllSubjects] = useState<string[]>([]);
   const [allBodies, setAllBodies] = useState<string[]>([]);
   const [previewSubject, setPreviewSubject] = useState("");
   const [previewBody, setPreviewBody] = useState("");
   const [dataLoaded, setDataLoaded] = useState(false);
 
-  // Fetch subjects/bodies from Firestore
   const fetchData = useCallback(async () => {
     try {
       const [subjectsSnap, bodiesSnap] = await Promise.all([
@@ -54,7 +34,6 @@ export default function SendMailButton() {
       setAllSubjects(subjects);
       setAllBodies(bodies);
       setDataLoaded(true);
-
       if (subjects.length > 0 && bodies.length > 0) {
         setPreviewSubject(pickRandom(subjects));
         setPreviewBody(pickRandom(bodies));
@@ -64,50 +43,15 @@ export default function SendMailButton() {
     }
   }, []);
 
-  // Load data on mount
-  useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+  useEffect(() => { fetchData(); }, [fetchData]);
 
-  // Shuffle preview
   const shuffle = () => {
     if (allSubjects.length > 0) setPreviewSubject(pickRandom(allSubjects));
     if (allBodies.length > 0) setPreviewBody(pickRandom(allBodies));
   };
 
-  // Fetch send counts
   useEffect(() => {
-    if (!user) {
-      setMyCount(null);
-      setTotalCount(null);
-      return;
-    }
-    const fetchCounts = async () => {
-      try {
-        const todayMidnight = getTodayMidnightKST();
-        // My today's count
-        const myQ = query(
-          collection(db, "sendLogs"),
-          where("userId", "==", user.uid),
-          where("sentAt", ">=", Timestamp.fromDate(todayMidnight))
-        );
-        // Total all-time count
-        const totalSnap = await getDocs(collection(db, "sendLogs"));
-        const mySnap = await getDocs(myQ);
-        setMyCount(mySnap.size);
-        setTotalCount(totalSnap.size);
-      } catch {
-        setMyCount(0);
-        setTotalCount(0);
-      }
-    };
-    fetchCounts();
-  }, [user]);
-
-  useEffect(() => {
-    return () => {
-      if (cooldownRef.current) clearInterval(cooldownRef.current);
-    };
+    return () => { if (cooldownRef.current) clearInterval(cooldownRef.current); };
   }, []);
 
   const startCooldown = () => {
@@ -156,15 +100,11 @@ export default function SendMailButton() {
               email: user.email,
               sentAt: Timestamp.now(),
             });
-            setMyCount((prev) => (prev === null ? 1 : prev + 1));
-            setTotalCount((prev) => (prev === null ? 1 : prev + 1));
-          } catch {
-            // Non-critical
-          }
+            window.dispatchEvent(new Event("mail-sent"));
+          } catch { /* non-critical */ }
         }
 
         startCooldown();
-        // Shuffle for next send
         shuffle();
       } else {
         setStatus("error");
@@ -175,10 +115,7 @@ export default function SendMailButton() {
       setMessage(err instanceof Error ? err.message : "오류 발생");
     }
 
-    setTimeout(() => {
-      setStatus("idle");
-      setMessage("");
-    }, 2500);
+    setTimeout(() => { setStatus("idle"); setMessage(""); }, 2500);
   };
 
   const isDisabled = status === "sending" || cooldown > 0;
@@ -191,7 +128,6 @@ export default function SendMailButton() {
 
   return (
     <>
-      {/* Toast notification - fixed at top, no touch area, auto-dismiss */}
       {message && (
         <div className="fixed top-6 inset-x-0 z-50 pointer-events-none flex justify-center animate-[fadeInOut_2.5s_ease-in-out]">
           <div
@@ -206,8 +142,6 @@ export default function SendMailButton() {
         </div>
       )}
 
-    <div className="w-full flex flex-col items-center">
-      {/* Preview card */}
       <div className="w-full flex flex-col items-center">
         {dataLoaded && previewSubject && previewBody && (
           <div className="w-full bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
@@ -236,70 +170,29 @@ export default function SendMailButton() {
             등록된 제목/내용이 없습니다.
           </p>
         )}
-      </div>
 
-      {/* Mobile: fixed bottom / PC: inline below card */}
-      <div className="
-        fixed bottom-0 inset-x-0 pb-8 pt-4 bg-gradient-to-t from-[#fbfbfd] via-[#fbfbfd] to-transparent
-        md:static md:bg-none md:pb-0 md:pt-8
-        flex flex-col items-center gap-4
-      ">
-        {/* Mobile: stats above button */}
-        <div className="md:hidden">
-          {user && myCount !== null && totalCount !== null && (
-            <div className="flex items-center gap-6 text-[12px]">
-              <div className="flex flex-col items-center">
-                <span className="text-[18px] font-semibold text-[#86868b]">{myCount}</span>
-                <span className="text-[#aeaeb2]">오늘</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-[18px] font-semibold text-[#86868b]">{Math.max(500 - myCount, 0)}</span>
-                <span className="text-[#aeaeb2]">내 잔여</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-[18px] font-semibold text-[#86868b]">{formatCount(totalCount)}</span>
-                <span className="text-[#aeaeb2]">전체</span>
-              </div>
-            </div>
-          )}
-        </div>
-
-        <button
-          onClick={handleSend}
-          disabled={isDisabled}
-          className={`
-            w-[420px] max-w-[calc(100vw-48px)] py-4 text-[17px] font-semibold rounded-2xl
-            transition-all active:scale-[0.97]
-            ${isDisabled
-              ? "bg-[#d2d2d7] text-white cursor-not-allowed"
-              : "bg-[#1d1d1f] text-white hover:bg-[#000000]"
-            }
-          `}
-        >
-          {buttonLabel()}
-        </button>
-
-        {/* PC: stats below button */}
-        <div className="hidden md:block">
-          {user && myCount !== null && totalCount !== null && (
-            <div className="flex items-center gap-6 text-[12px]">
-              <div className="flex flex-col items-center">
-                <span className="text-[18px] font-semibold text-[#86868b]">{myCount}</span>
-                <span className="text-[#aeaeb2]">오늘</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-[18px] font-semibold text-[#86868b]">{Math.max(500 - myCount, 0)}</span>
-                <span className="text-[#aeaeb2]">내 잔여</span>
-              </div>
-              <div className="flex flex-col items-center">
-                <span className="text-[18px] font-semibold text-[#86868b]">{formatCount(totalCount)}</span>
-                <span className="text-[#aeaeb2]">전체</span>
-              </div>
-            </div>
-          )}
+        {/* Mobile: fixed bottom / PC: inline */}
+        <div className="
+          fixed bottom-0 inset-x-0 pb-8 pt-4 bg-gradient-to-t from-[#fbfbfd] via-[#fbfbfd] to-transparent
+          md:static md:bg-none md:pb-0 md:pt-6
+          flex flex-col items-center gap-3
+        ">
+          <button
+            onClick={handleSend}
+            disabled={isDisabled}
+            className={`
+              w-[420px] max-w-[calc(100vw-48px)] py-4 text-[17px] font-semibold rounded-2xl
+              transition-all active:scale-[0.97]
+              ${isDisabled
+                ? "bg-[#d2d2d7] text-white cursor-not-allowed"
+                : "bg-[#1d1d1f] text-white hover:bg-[#000000]"
+              }
+            `}
+          >
+            {buttonLabel()}
+          </button>
         </div>
       </div>
-    </div>
     </>
   );
 }
