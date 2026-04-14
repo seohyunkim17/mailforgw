@@ -13,7 +13,7 @@ export default function LoginButton() {
         onClick={logout}
         className="text-[13px] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
       >
-        로그아웃
+        logout
       </button>
     );
   }
