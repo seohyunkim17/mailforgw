@@ -54,7 +54,7 @@ export default function Home() {
 
       {/* Center: Title + Preview (vertically centered, title offset above) */}
       <div className="flex-1 flex flex-col items-center justify-center py-4 min-h-0">
-        <div className="w-full max-w-[420px] flex flex-col items-center -mt-10 overflow-auto max-h-full">
+        <div className="w-full max-w-[420px] flex flex-col items-center -mt-10 overflow-auto max-h-full px-1">
           <div className="text-center mb-6">
             <h1 className="text-[28px] font-semibold tracking-tight text-[#1d1d1f]">
               mail to wakeone
