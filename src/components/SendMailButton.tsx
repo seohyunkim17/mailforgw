@@ -225,7 +225,7 @@ export default function SendMailButton() {
             <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">
               {previewSubject}
             </p>
-            <p className="text-[13px] text-[#6e6e73] leading-relaxed whitespace-pre-wrap">
+            <p className="text-[13px] text-[#6e6e73] leading-relaxed whitespace-pre-wrap text-justify">
               {previewBody}
             </p>
           </div>
