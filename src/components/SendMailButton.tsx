@@ -144,7 +144,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
     <div className="w-full">
       {dataLoaded && previewSubject && previewBody && (
         <div className="w-full bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
-          <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">
+          <p className="text-[12px] font-bold text-[#1d1d1f] mb-2 text-center">
             {previewSubject}
           </p>
           <p className="text-[13px] text-[#6e6e73] leading-relaxed whitespace-pre-wrap text-justify">
