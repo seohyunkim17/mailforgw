@@ -142,15 +142,18 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
     <div className="w-full">
       {dataLoaded && previewSubject && previewBody && (
         <div className="w-full bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[11px] font-medium text-[#86868b] uppercase tracking-wide">
-              미리보기
-            </span>
+          <div className="flex items-center justify-end mb-3">
             <button
               onClick={shuffle}
-              className="text-[12px] text-[#0071e3] hover:text-[#0077ED] font-medium transition-colors"
+              className="text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+              aria-label="새로고침"
             >
-              새로고침
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M21.5 2v6h-6" />
+                <path d="M2.5 22v-6h6" />
+                <path d="M2.5 11.5a10 10 0 0 1 18.8-4.3L21.5 8" />
+                <path d="M21.5 12.5a10 10 0 0 1-18.8 4.2L2.5 16" />
+              </svg>
             </button>
           </div>
           <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">
