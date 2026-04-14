@@ -76,7 +76,7 @@ export default function Home() {
             <div className="mt-3">
               <MailtoFallback />
             </div>
-            <p className="mt-4 text-[11px] text-[#1d1d1f] font-semibold text-center underline underline-offset-2">
+            <p className="mt-4 text-[11px] text-[#86868b] text-center underline underline-offset-2">
               반드시 Safari, Chrome 등으로 접속해주세요 (트위터 X)
             </p>
             <p className="mt-4 text-[11px] text-[#aeaeb2] text-center leading-relaxed">
