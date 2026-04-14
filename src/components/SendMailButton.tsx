@@ -65,7 +65,7 @@ export default function SendMailButton() {
     if (allBodies.length > 0) setPreviewBody(pickRandom(allBodies));
   };
 
-  // Fetch today's send count (all users combined)
+  // Fetch today's send count (per user - Gmail limit is per account)
   useEffect(() => {
     if (!user) {
       setTodayCount(null);
@@ -76,6 +76,7 @@ export default function SendMailButton() {
         const todayMidnight = getTodayMidnightKST();
         const q = query(
           collection(db, "sendLogs"),
+          where("userId", "==", user.uid),
           where("sentAt", ">=", Timestamp.fromDate(todayMidnight))
         );
         const snap = await getDocs(q);
