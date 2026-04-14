@@ -172,6 +172,22 @@ export default function SendMailButton() {
   };
 
   return (
+    <>
+      {/* Toast notification - fixed at top, no touch area, auto-dismiss */}
+      {message && (
+        <div className="fixed top-6 left-1/2 -translate-x-1/2 z-50 pointer-events-none animate-[fadeInOut_5s_ease-in-out]">
+          <div
+            className={`px-5 py-3 rounded-2xl text-[14px] font-medium backdrop-blur-xl shadow-lg ${
+              status === "success"
+                ? "bg-white/90 text-[#0071e3]"
+                : "bg-white/90 text-[#ff3b30]"
+            }`}
+          >
+            {status === "success" ? `\u2713 ${message}` : message}
+          </div>
+        </div>
+      )}
+
     <div className="w-full flex flex-col items-center gap-5">
       {/* Preview card */}
       {dataLoaded && previewSubject && previewBody && (
@@ -217,23 +233,12 @@ export default function SendMailButton() {
         {buttonLabel()}
       </button>
 
-      {message && (
-        <div
-          className={`px-5 py-3 rounded-xl text-[14px] font-medium ${
-            status === "success"
-              ? "bg-[#e8f0fe] text-[#0071e3]"
-              : "bg-[#ffeaea] text-[#ff3b30]"
-          }`}
-        >
-          {status === "success" ? `\u2713 ${message}` : message}
-        </div>
-      )}
-
       {user && todayCount !== null && (
         <p className="text-[13px] text-[#86868b]">
           오늘 {todayCount}건 발송 · 잔여 {Math.max(500 - todayCount, 0)}건
         </p>
       )}
     </div>
+    </>
   );
 }
