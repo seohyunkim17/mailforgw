@@ -5,7 +5,6 @@ import { collection, getDocs, addDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { sendEmail } from "@/lib/gmail";
 import { useAuth } from "./AuthProvider";
-import Stats from "./Stats";
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -14,7 +13,7 @@ function pickRandom<T>(arr: T[]): T {
 export default function SendMailButton() {
   const { user, accessToken, login } = useAuth();
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
-  const [message, setMessage] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
   const [cooldown, setCooldown] = useState(0);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -79,20 +78,19 @@ export default function SendMailButton() {
 
     if (!previewSubject || !previewBody) {
       setStatus("error");
-      setMessage("등록된 제목 또는 내용이 없습니다.");
-      setTimeout(() => { setStatus("idle"); setMessage(""); }, 3000);
+      setErrorMsg("등록된 제목 또는 내용이 없습니다.");
+      setTimeout(() => { setStatus("idle"); setErrorMsg(""); }, 3000);
       return;
     }
 
     setStatus("sending");
-    setMessage("");
+    setErrorMsg("");
 
     try {
       const result = await sendEmail(token, user!.email!, previewSubject, previewBody);
 
       if (result.success) {
         setStatus("success");
-        setMessage("발송 완료");
 
         if (user) {
           try {
@@ -107,16 +105,17 @@ export default function SendMailButton() {
 
         startCooldown();
         shuffle();
+        setTimeout(() => { setStatus("idle"); }, 2500);
       } else {
         setStatus("error");
-        setMessage(result.error || "발송 실패");
+        setErrorMsg(result.error || "발송 실패");
+        setTimeout(() => { setStatus("idle"); setErrorMsg(""); }, 3000);
       }
     } catch (err: unknown) {
       setStatus("error");
-      setMessage(err instanceof Error ? err.message : "오류 발생");
+      setErrorMsg(err instanceof Error ? err.message : "오류 발생");
+      setTimeout(() => { setStatus("idle"); setErrorMsg(""); }, 3000);
     }
-
-    setTimeout(() => { setStatus("idle"); setMessage(""); }, 2500);
   };
 
   const isDisabled = status === "sending" || cooldown > 0;
@@ -129,21 +128,8 @@ export default function SendMailButton() {
 
   return (
     <>
-      {message && (
-        <div className="fixed top-6 inset-x-0 z-50 pointer-events-none flex justify-center animate-[fadeInOut_2.5s_ease-in-out]">
-          <div
-            className={`px-5 py-3 rounded-2xl text-[14px] font-medium ${
-              status === "success"
-                ? "bg-[#e8f0fe] text-[#0071e3]"
-                : "bg-[#ffeaea] text-[#ff3b30]"
-            }`}
-          >
-            {status === "success" ? `\u2713 ${message}` : message}
-          </div>
-        </div>
-      )}
-
-      <div className="w-full flex flex-col items-center">
+      {/* Preview card - center area */}
+      <div className="w-full">
         {dataLoaded && previewSubject && previewBody && (
           <div className="w-full bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-3">
@@ -167,36 +153,31 @@ export default function SendMailButton() {
         )}
 
         {dataLoaded && !previewSubject && !previewBody && (
-          <p className="text-[13px] text-[#86868b]">
+          <p className="text-[13px] text-[#86868b] text-center">
             등록된 제목/내용이 없습니다.
           </p>
         )}
 
-        {/* Mobile: fixed bottom / PC: inline */}
-        <div className="
-          fixed bottom-0 inset-x-0 pb-8 pt-4 bg-gradient-to-t from-[#fbfbfd] via-[#fbfbfd] to-transparent
-          md:static md:bg-none md:pb-0 md:pt-6
-          flex flex-col items-center gap-4
-        ">
-          <div className="md:hidden">
-            <Stats />
-          </div>
-          <button
-            onClick={handleSend}
-            disabled={isDisabled}
-            className={`
-              w-[420px] max-w-[calc(100vw-48px)] py-4 text-[17px] font-semibold rounded-2xl
-              transition-all active:scale-[0.97]
-              ${isDisabled
-                ? "bg-[#d2d2d7] text-white cursor-not-allowed"
-                : "bg-[#1d1d1f] text-white hover:bg-[#000000]"
-              }
-            `}
-          >
-            {buttonLabel()}
-          </button>
-        </div>
+        {errorMsg && (
+          <p className="mt-3 text-[13px] text-[#ff3b30] font-medium text-center">{errorMsg}</p>
+        )}
       </div>
+
+      {/* Button - bottom area */}
+      <button
+        onClick={handleSend}
+        disabled={isDisabled}
+        className={`
+          w-full py-4 text-[17px] font-semibold rounded-2xl
+          transition-all active:scale-[0.97]
+          ${isDisabled
+            ? "bg-[#d2d2d7] text-white cursor-not-allowed"
+            : "bg-[#1d1d1f] text-white hover:bg-[#000000]"
+          }
+        `}
+      >
+        {buttonLabel()}
+      </button>
     </>
   );
 }
