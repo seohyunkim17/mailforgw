@@ -33,6 +33,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
   const [showSwitchPopup, setShowSwitchPopup] = useState(false);
   const [showLimitPopup, setShowLimitPopup] = useState(false);
   const [toasts, setToasts] = useState<number[]>([]);
+  const toastIdRef = useRef(0);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [allSubjects, setAllSubjects] = useState<string[]>([]);
@@ -101,11 +102,11 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
 
       if (result.success) {
         setStatus("success");
-        const toastId = Date.now();
+        const toastId = ++toastIdRef.current;
         setToasts((prev) => [...prev, toastId]);
         setTimeout(() => {
           setToasts((prev) => prev.filter((id) => id !== toastId));
-        }, 300);
+        }, 500);
 
         if (user) {
           try {
@@ -180,7 +181,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
         {toasts.map((id) => (
           <div
             key={id}
-            style={{ animation: "toastSlide 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards" }}
+            style={{ animation: "toastSlide 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}
           >
             <div className="px-5 py-3 rounded-2xl text-[14px] font-medium bg-[#e8f0fe] text-[#0071e3]">
               ✓ 발송 완료
