@@ -71,9 +71,9 @@ export default function Home() {
             </button>
           </div>
         ) : (
-          <div className="mt-8 flex flex-col items-center">
+          <div className="mt-8 w-full max-w-[280px] flex flex-col items-center">
             <LoginButton />
-            <div className="mt-3">
+            <div className="mt-3 w-full">
               <MailtoFallback />
             </div>
             <p className="mt-4 text-[11px] text-[#86868b] text-center underline underline-offset-2">
