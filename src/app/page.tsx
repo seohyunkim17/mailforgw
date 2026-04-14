@@ -70,7 +70,7 @@ export default function Home() {
       </div>
 
       {/* Bottom: Send button (fixed) */}
-      <div className="flex-shrink-0 flex items-center justify-center py-6">
+      <div className="flex-shrink-0 flex items-center justify-center pt-2 pb-6">
         <button
           onClick={() => sendRef.current?.send()}
           disabled={btnState.disabled}
