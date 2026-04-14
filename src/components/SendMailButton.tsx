@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
 import { collection, getDocs, addDoc, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { sendEmail } from "@/lib/gmail";
@@ -10,7 +10,13 @@ function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
 }
 
-export default function SendMailButton() {
+export interface SendMailHandle {
+  send: () => void;
+  isDisabled: boolean;
+  buttonLabel: string;
+}
+
+const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref) {
   const { user, accessToken, login } = useAuth();
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
@@ -120,64 +126,53 @@ export default function SendMailButton() {
 
   const isDisabled = status === "sending" || cooldown > 0;
 
-  const buttonLabel = () => {
+  const buttonLabel = (() => {
     if (status === "sending") return "발송 중...";
     if (cooldown > 0) return "대기 중";
     return "메일 보내기";
-  };
+  })();
+
+  useImperativeHandle(ref, () => ({
+    send: handleSend,
+    isDisabled,
+    buttonLabel,
+  }));
 
   return (
-    <>
-      {/* Preview card - center area */}
-      <div className="w-full">
-        {dataLoaded && previewSubject && previewBody && (
-          <div className="w-full bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-[11px] font-medium text-[#86868b] uppercase tracking-wide">
-                미리보기
-              </span>
-              <button
-                onClick={shuffle}
-                className="text-[12px] text-[#0071e3] hover:text-[#0077ED] font-medium transition-colors"
-              >
-                새로고침
-              </button>
-            </div>
-            <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">
-              {previewSubject}
-            </p>
-            <p className="text-[13px] text-[#6e6e73] leading-relaxed whitespace-pre-wrap text-justify">
-              {previewBody}
-            </p>
+    <div className="w-full">
+      {dataLoaded && previewSubject && previewBody && (
+        <div className="w-full bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-medium text-[#86868b] uppercase tracking-wide">
+              미리보기
+            </span>
+            <button
+              onClick={shuffle}
+              className="text-[12px] text-[#0071e3] hover:text-[#0077ED] font-medium transition-colors"
+            >
+              새로고침
+            </button>
           </div>
-        )}
-
-        {dataLoaded && !previewSubject && !previewBody && (
-          <p className="text-[13px] text-[#86868b] text-center">
-            등록된 제목/내용이 없습니다.
+          <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">
+            {previewSubject}
           </p>
-        )}
+          <p className="text-[13px] text-[#6e6e73] leading-relaxed whitespace-pre-wrap text-justify">
+            {previewBody}
+          </p>
+        </div>
+      )}
 
-        {errorMsg && (
-          <p className="mt-3 text-[13px] text-[#ff3b30] font-medium text-center">{errorMsg}</p>
-        )}
-      </div>
+      {dataLoaded && !previewSubject && !previewBody && (
+        <p className="text-[13px] text-[#86868b] text-center">
+          등록된 제목/내용이 없습니다.
+        </p>
+      )}
 
-      {/* Button - bottom area */}
-      <button
-        onClick={handleSend}
-        disabled={isDisabled}
-        className={`
-          w-full py-4 text-[17px] font-semibold rounded-2xl
-          transition-all active:scale-[0.97]
-          ${isDisabled
-            ? "bg-[#d2d2d7] text-white cursor-not-allowed"
-            : "bg-[#1d1d1f] text-white hover:bg-[#000000]"
-          }
-        `}
-      >
-        {buttonLabel()}
-      </button>
-    </>
+      {errorMsg && (
+        <p className="mt-3 text-[13px] text-[#ff3b30] font-medium text-center">{errorMsg}</p>
+      )}
+    </div>
   );
-}
+});
+
+export default SendMailButton;

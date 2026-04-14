@@ -1,12 +1,30 @@
 "use client";
 
+import { useRef, useState, useEffect, useCallback } from "react";
 import LoginButton from "@/components/LoginButton";
-import SendMailButton from "@/components/SendMailButton";
+import SendMailButton, { SendMailHandle } from "@/components/SendMailButton";
 import Stats from "@/components/Stats";
 import { useAuth } from "@/components/AuthProvider";
 
 export default function Home() {
   const { user, loading } = useAuth();
+  const sendRef = useRef<SendMailHandle>(null);
+  const [btnState, setBtnState] = useState({ disabled: false, label: "메일 보내기" });
+
+  // Poll ref for button state changes
+  const updateBtn = useCallback(() => {
+    if (sendRef.current) {
+      setBtnState({
+        disabled: sendRef.current.isDisabled,
+        label: sendRef.current.buttonLabel,
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    const interval = setInterval(updateBtn, 100);
+    return () => clearInterval(interval);
+  }, [updateBtn]);
 
   if (loading) {
     return (
@@ -28,16 +46,16 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col bg-[#fbfbfd] px-6">
-      <div className="w-full max-w-[420px] mx-auto flex flex-col min-h-screen">
-        {/* Top: Stats */}
-        <div className="flex items-center justify-center py-6">
-          <Stats />
-        </div>
+    <main className="h-screen flex flex-col bg-[#fbfbfd] px-6 overflow-auto">
+      {/* Top: Stats */}
+      <div className="flex-shrink-0 flex items-center justify-center py-6">
+        <Stats />
+      </div>
 
-        {/* Center: Title + Preview card */}
-        <div className="flex-1 flex flex-col items-center justify-center gap-6">
-          <div className="text-center">
+      {/* Center: Title + Preview (vertically centered, title offset above) */}
+      <div className="flex-1 flex flex-col items-center justify-center">
+        <div className="w-full max-w-[420px] flex flex-col items-center -mt-10">
+          <div className="text-center mb-6">
             <h1 className="text-[28px] font-semibold tracking-tight text-[#1d1d1f]">
               mail to wakeone
             </h1>
@@ -47,11 +65,26 @@ export default function Home() {
               <LoginButton />
             </div>
           </div>
-          <SendMailButton />
+          <SendMailButton ref={sendRef} />
         </div>
+      </div>
 
-        {/* Bottom: same height as top */}
-        <div className="py-6" />
+      {/* Bottom: Send button (fixed) */}
+      <div className="flex-shrink-0 flex items-center justify-center py-6">
+        <button
+          onClick={() => sendRef.current?.send()}
+          disabled={btnState.disabled}
+          className={`
+            w-full max-w-[420px] py-4 text-[17px] font-semibold rounded-2xl
+            transition-all active:scale-[0.97]
+            ${btnState.disabled
+              ? "bg-[#d2d2d7] text-white cursor-not-allowed"
+              : "bg-[#1d1d1f] text-white hover:bg-[#000000]"
+            }
+          `}
+        >
+          {btnState.label}
+        </button>
       </div>
     </main>
   );
