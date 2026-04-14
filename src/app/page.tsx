@@ -16,8 +16,8 @@ export default function Home() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#fbfbfd]">
-      <div className="w-full max-w-md flex flex-col items-center gap-8">
+    <main className="min-h-screen flex flex-col items-center bg-[#fbfbfd] px-6 pt-12 pb-48 md:justify-center md:pt-0 md:pb-0">
+      <div className="w-full max-w-[420px] flex flex-col items-center gap-8 md:pb-48">
         <div className="text-center">
           <h1 className="text-[28px] font-semibold tracking-tight text-[#1d1d1f]">
             mail to wakeone
@@ -32,14 +32,13 @@ export default function Home() {
         </div>
 
         {user ? (
-          <div className="w-full flex flex-col items-center gap-5">
-            <SendMailButton />
-          </div>
+          <SendMailButton />
         ) : (
-          <LoginButton />
+          <div className="mt-8">
+            <LoginButton />
+          </div>
         )}
       </div>
-
     </main>
   );
 }

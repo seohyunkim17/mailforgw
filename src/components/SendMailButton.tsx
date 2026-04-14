@@ -207,10 +207,10 @@ export default function SendMailButton() {
       )}
 
     <div className="w-full flex flex-col items-center">
-      {/* Preview card - scrollable area */}
-      <div className="w-full flex flex-col items-center gap-5 mb-8">
+      {/* Preview card */}
+      <div className="w-full flex flex-col items-center">
         {dataLoaded && previewSubject && previewBody && (
-          <div className="w-full max-w-[420px] bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+          <div className="w-full bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
             <div className="flex items-center justify-between mb-3">
               <span className="text-[11px] font-medium text-[#86868b] uppercase tracking-wide">
                 미리보기
