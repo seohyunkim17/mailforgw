@@ -73,10 +73,10 @@ export default function Home() {
         ) : (
           <div className="mt-8 w-full max-w-[280px] flex flex-col items-center">
             <LoginButton />
-            <div className="mt-3 w-full">
+            <div className="mt-2 w-full">
               <MailtoFallback />
             </div>
-            <p className="mt-4 text-[11px] text-[#4b4b4b] text-center underline underline-offset-2">
+            <p className="mt-6 text-[11px] text-[#4b4b4b] text-center underline underline-offset-2">
               반드시 Safari, Chrome 등으로 접속해주세요 (트위터 X)
             </p>
             <p className="mt-2 text-[11px] text-[#aeaeb2] text-center leading-relaxed">
