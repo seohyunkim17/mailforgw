@@ -88,77 +88,67 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
     }
 
     if (!previewSubject || !previewBody) {
-      setStatus("error");
       setErrorMsg("등록된 제목 또는 내용이 없습니다.");
-      setTimeout(() => { setStatus("idle"); setErrorMsg(""); }, 3000);
+      setTimeout(() => { setErrorMsg(""); }, 3000);
       return;
     }
 
-    setStatus("sending");
-    setErrorMsg("");
+    // Immediate UI feedback - don't wait for API
+    startCooldown();
+    const subjectToSend = previewSubject;
+    const bodyToSend = previewBody;
+    shuffle();
+    const newCount = sendCount + 1;
+    setSendCount(newCount);
 
-    try {
-      const result = await sendEmail(token, user!.email!, previewSubject, previewBody);
+    // Fire-and-forget: send in background
+    (async () => {
+      try {
+        const result = await sendEmail(token!, user!.email!, subjectToSend, bodyToSend);
+        if (result.success) {
+          const toastId = ++toastIdRef.current;
+          setToasts((prev) => [...prev, toastId]);
+          setTimeout(() => {
+            setToasts((prev) => prev.filter((id) => id !== toastId));
+          }, 1500);
 
-      if (result.success) {
-        setStatus("success");
-        const toastId = ++toastIdRef.current;
-        setToasts((prev) => [...prev, toastId]);
-        setTimeout(() => {
-          setToasts((prev) => prev.filter((id) => id !== toastId));
-        }, 500);
+          if (user) {
+            try {
+              await addDoc(collection(db, "sendLogs"), {
+                userId: user.uid,
+                email: user.email,
+                sentAt: Timestamp.now(),
+              });
+              window.dispatchEvent(new Event("mail-sent"));
+            } catch { /* non-critical */ }
 
-        if (user) {
-          try {
-            await addDoc(collection(db, "sendLogs"), {
-              userId: user.uid,
-              email: user.email,
-              sentAt: Timestamp.now(),
-            });
-            window.dispatchEvent(new Event("mail-sent"));
-          } catch { /* non-critical */ }
+            // Check daily limit
+            try {
+              const todayMidnight = getTodayMidnightKST();
+              const myQ = query(
+                collection(db, "sendLogs"),
+                where("userId", "==", user.uid),
+                where("sentAt", ">=", Timestamp.fromDate(todayMidnight))
+              );
+              const snap = await getDocs(myQ);
+              if (snap.size >= 500) {
+                setShowLimitPopup(true);
+              }
+            } catch { /* ignore */ }
+          }
+        } else {
+          setErrorMsg(result.error || "발송 실패");
+          setTimeout(() => { setErrorMsg(""); }, 3000);
         }
-
-        startCooldown();
-        shuffle();
-        const newCount = sendCount + 1;
-        setSendCount(newCount);
-
-        // Check daily limit by querying today's count
-        if (user) {
-          try {
-            const todayMidnight = getTodayMidnightKST();
-            const myQ = query(
-              collection(db, "sendLogs"),
-              where("userId", "==", user.uid),
-              where("sentAt", ">=", Timestamp.fromDate(todayMidnight))
-            );
-            const snap = await getDocs(myQ);
-            if (snap.size >= 500) {
-              setShowLimitPopup(true);
-            }
-          } catch { /* ignore */ }
-        }
-
-        setTimeout(() => { setStatus("idle"); }, 300);
-      } else {
-        setStatus("error");
-        setErrorMsg(result.error || "발송 실패");
-        setTimeout(() => { setStatus("idle"); setErrorMsg(""); }, 3000);
+      } catch (err: unknown) {
+        setErrorMsg(err instanceof Error ? err.message : "오류 발생");
+        setTimeout(() => { setErrorMsg(""); }, 3000);
       }
-    } catch (err: unknown) {
-      setStatus("error");
-      setErrorMsg(err instanceof Error ? err.message : "오류 발생");
-      setTimeout(() => { setStatus("idle"); setErrorMsg(""); }, 3000);
-    }
+    })();
   };
 
-  const isDisabled = status === "sending" || cooldown > 0;
-
-  const buttonLabel = (() => {
-    if (status === "sending") return "발송 중...";
-    return "메일 보내기";
-  })();
+  const isDisabled = cooldown > 0;
+  const buttonLabel = "메일 보내기";
 
   useImperativeHandle(ref, () => ({
     send: handleSend,
@@ -181,7 +171,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
         {toasts.map((id) => (
           <div
             key={id}
-            style={{ animation: "toastSlide 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}
+            style={{ animation: "toastSlide 1.5s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}
           >
             <div className="px-5 py-3 rounded-2xl text-[14px] font-medium bg-[#e8f0fe] text-[#0071e3]">
               ✓ 발송 완료
