@@ -238,24 +238,31 @@ export default function SendMailButton() {
         )}
       </div>
 
-      {/* Fixed bottom area - stats above button */}
-      <div className="fixed bottom-0 inset-x-0 pb-8 pt-4 bg-gradient-to-t from-[#fbfbfd] via-[#fbfbfd] to-transparent flex flex-col items-center gap-4">
-        {user && myCount !== null && totalCount !== null && (
-          <div className="flex items-center gap-6 text-[12px]">
-            <div className="flex flex-col items-center">
-              <span className="text-[18px] font-semibold text-[#86868b]">{myCount}</span>
-              <span className="text-[#aeaeb2]">오늘</span>
+      {/* Mobile: fixed bottom / PC: inline below card */}
+      <div className="
+        fixed bottom-0 inset-x-0 pb-8 pt-4 bg-gradient-to-t from-[#fbfbfd] via-[#fbfbfd] to-transparent
+        md:static md:bg-none md:pb-0 md:pt-8
+        flex flex-col items-center gap-4
+      ">
+        {/* Mobile: stats above button */}
+        <div className="md:hidden">
+          {user && myCount !== null && totalCount !== null && (
+            <div className="flex items-center gap-6 text-[12px]">
+              <div className="flex flex-col items-center">
+                <span className="text-[18px] font-semibold text-[#86868b]">{myCount}</span>
+                <span className="text-[#aeaeb2]">오늘</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-[18px] font-semibold text-[#86868b]">{Math.max(500 - myCount, 0)}</span>
+                <span className="text-[#aeaeb2]">내 잔여</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-[18px] font-semibold text-[#86868b]">{formatCount(totalCount)}</span>
+                <span className="text-[#aeaeb2]">전체</span>
+              </div>
             </div>
-            <div className="flex flex-col items-center">
-              <span className="text-[18px] font-semibold text-[#86868b]">{Math.max(500 - myCount, 0)}</span>
-              <span className="text-[#aeaeb2]">내 잔여</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-[18px] font-semibold text-[#86868b]">{formatCount(totalCount)}</span>
-              <span className="text-[#aeaeb2]">전체</span>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
 
         <button
           onClick={handleSend}
@@ -271,6 +278,26 @@ export default function SendMailButton() {
         >
           {buttonLabel()}
         </button>
+
+        {/* PC: stats below button */}
+        <div className="hidden md:block">
+          {user && myCount !== null && totalCount !== null && (
+            <div className="flex items-center gap-6 text-[12px]">
+              <div className="flex flex-col items-center">
+                <span className="text-[18px] font-semibold text-[#86868b]">{myCount}</span>
+                <span className="text-[#aeaeb2]">오늘</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-[18px] font-semibold text-[#86868b]">{Math.max(500 - myCount, 0)}</span>
+                <span className="text-[#aeaeb2]">내 잔여</span>
+              </div>
+              <div className="flex flex-col items-center">
+                <span className="text-[18px] font-semibold text-[#86868b]">{formatCount(totalCount)}</span>
+                <span className="text-[#aeaeb2]">전체</span>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
     </>
