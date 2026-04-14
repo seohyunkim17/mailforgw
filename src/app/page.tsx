@@ -52,24 +52,19 @@ export default function Home() {
         </h1>
         {inApp ? (
           <div className="mt-6 text-center">
-            <p className="text-[14px] text-[#86868b] mb-4 leading-relaxed">
+            <p className="text-[14px] text-[#86868b] mb-1 leading-relaxed">
               인앱 브라우저에서는 Google 로그인이<br />지원되지 않습니다.
             </p>
-            <button
-              onClick={() => {
-                window.location.href = `intent://${window.location.host}${window.location.pathname}#Intent;scheme=https;package=com.android.chrome;end`;
-              }}
-              className="w-full max-w-[280px] px-6 py-3 bg-[#1d1d1f] text-white text-[15px] font-medium rounded-xl active:scale-[0.98] transition-all mb-3"
-            >
-              Chrome으로 열기
-            </button>
+            <p className="text-[12px] text-[#aeaeb2] mb-5">
+              링크 복사 후 Chrome 또는 Safari로 접속해주세요.
+            </p>
             <button
               onClick={() => {
                 const url = window.location.href;
                 navigator.clipboard.writeText(url);
-                alert("링크가 복사되었습니다. Safari 또는 Chrome에 붙여넣기 해주세요.");
+                alert("링크가 복사되었습니다. Chrome 또는 Safari에 붙여넣기 해주세요.");
               }}
-              className="w-full max-w-[280px] px-6 py-3 bg-[#f0f0f5] text-[#86868b] text-[15px] font-medium rounded-xl active:scale-[0.98] transition-all"
+              className="w-full max-w-[280px] px-6 py-3 bg-[#1d1d1f] text-white text-[15px] font-medium rounded-xl active:scale-[0.98] transition-all"
             >
               링크 복사
             </button>
