@@ -1,8 +1,7 @@
 "use client";
 
-export const dynamic = "force-dynamic";
-
 import LoginButton from "@/components/LoginButton";
+import SendMailButton from "@/components/SendMailButton";
 import { useAuth } from "@/components/AuthProvider";
 
 export default function Home() {
@@ -25,7 +24,7 @@ export default function Home() {
             <span className="text-sm text-gray-600">{user.email}</span>
             <LoginButton />
           </div>
-          <p className="mt-4 text-gray-500 text-sm">로그인 완료. 메일 발송 준비됨.</p>
+          <SendMailButton />
         </>
       ) : (
         <LoginButton />
