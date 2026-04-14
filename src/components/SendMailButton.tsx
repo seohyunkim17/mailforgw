@@ -58,7 +58,7 @@ export default function SendMailButton() {
   }, []);
 
   const startCooldown = () => {
-    setCooldown(5);
+    setCooldown(2);
     if (cooldownRef.current) clearInterval(cooldownRef.current);
     cooldownRef.current = setInterval(() => {
       setCooldown((prev) => {
