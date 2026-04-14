@@ -256,12 +256,19 @@ export default function SendMailButton() {
         </button>
 
         {user && myCount !== null && totalCount !== null && (
-          <div className="flex items-center gap-5 text-[13px] text-[#86868b]">
-            <span>오늘 {myCount}건</span>
-            <span className="text-[#d2d2d7]">|</span>
-            <span>잔여 {Math.max(500 - myCount, 0)}건</span>
-            <span className="text-[#d2d2d7]">|</span>
-            <span>전체 {formatCount(totalCount)}건</span>
+          <div className="flex items-center gap-6 text-[12px]">
+            <div className="flex flex-col items-center">
+              <span className="text-[18px] font-semibold text-[#1d1d1f]">{myCount}</span>
+              <span className="text-[#86868b]">오늘</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-[18px] font-semibold text-[#1d1d1f]">{Math.max(500 - myCount, 0)}</span>
+              <span className="text-[#86868b]">잔여</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-[18px] font-semibold text-[#0071e3]">{formatCount(totalCount)}</span>
+              <span className="text-[#86868b]">전체</span>
+            </div>
           </div>
         )}
       </div>
