@@ -29,6 +29,11 @@ export default function Home() {
       ) : (
         <LoginButton />
       )}
+      <footer className="fixed bottom-4 right-4">
+        <a href="/admin" className="text-xs text-gray-400 hover:text-gray-600">
+          관리자
+        </a>
+      </footer>
     </main>
   );
 }
