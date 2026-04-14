@@ -55,7 +55,7 @@ export default function Home() {
             <p className="text-[13px] text-[#86868b] mb-1">
               인앱 브라우저에서는 Google 로그인이 지원되지 않습니다.
             </p>
-            <p className="text-[13px] text-[#aeaeb2] mb-5">
+            <p className="text-[13px] text-[#86868b] mb-5">
               링크 복사 후 Chrome 혹은 Safari로 접속해주세요.
             </p>
             <button
