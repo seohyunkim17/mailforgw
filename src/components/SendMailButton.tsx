@@ -238,8 +238,25 @@ export default function SendMailButton() {
         )}
       </div>
 
-      {/* Fixed bottom area - button + stats */}
-      <div className="fixed bottom-0 inset-x-0 pb-8 pt-4 bg-gradient-to-t from-[#fbfbfd] via-[#fbfbfd] to-transparent flex flex-col items-center gap-3">
+      {/* Fixed bottom area - stats above button */}
+      <div className="fixed bottom-0 inset-x-0 pb-8 pt-4 bg-gradient-to-t from-[#fbfbfd] via-[#fbfbfd] to-transparent flex flex-col items-center gap-4">
+        {user && myCount !== null && totalCount !== null && (
+          <div className="flex items-center gap-6 text-[12px]">
+            <div className="flex flex-col items-center">
+              <span className="text-[18px] font-semibold text-[#86868b]">{myCount}</span>
+              <span className="text-[#aeaeb2]">오늘</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-[18px] font-semibold text-[#86868b]">{Math.max(500 - myCount, 0)}</span>
+              <span className="text-[#aeaeb2]">내 잔여</span>
+            </div>
+            <div className="flex flex-col items-center">
+              <span className="text-[18px] font-semibold text-[#86868b]">{formatCount(totalCount)}</span>
+              <span className="text-[#aeaeb2]">전체</span>
+            </div>
+          </div>
+        )}
+
         <button
           onClick={handleSend}
           disabled={isDisabled}
@@ -254,23 +271,6 @@ export default function SendMailButton() {
         >
           {buttonLabel()}
         </button>
-
-        {user && myCount !== null && totalCount !== null && (
-          <div className="flex items-center gap-6 text-[12px]">
-            <div className="flex flex-col items-center">
-              <span className="text-[18px] font-semibold text-[#1d1d1f]">{myCount}</span>
-              <span className="text-[#86868b]">오늘</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-[18px] font-semibold text-[#1d1d1f]">{Math.max(500 - myCount, 0)}</span>
-              <span className="text-[#86868b]">내 잔여</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <span className="text-[18px] font-semibold text-[#0071e3]">{formatCount(totalCount)}</span>
-              <span className="text-[#86868b]">전체</span>
-            </div>
-          </div>
-        )}
       </div>
     </div>
     </>
