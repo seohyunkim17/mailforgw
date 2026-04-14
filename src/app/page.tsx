@@ -37,7 +37,7 @@ export default function Home() {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center bg-[#fbfbfd] px-6">
         <h1 className="text-[28px] font-semibold tracking-tight text-[#1d1d1f]">
-          mail to wakeone
+          to wakeone
         </h1>
         <div className="mt-8">
           <LoginButton />
@@ -61,7 +61,7 @@ export default function Home() {
         <div className="w-full max-w-[420px] mx-auto flex flex-col items-center">
           <div className="text-center mb-6">
             <h1 className="text-[28px] font-semibold tracking-tight text-[#1d1d1f]">
-              mail to wakeone
+              to wakeone
             </h1>
             <div className="flex items-center justify-center gap-2 text-[13px] text-[#86868b]">
               <span>{user.email}</span>
