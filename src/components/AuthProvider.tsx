@@ -30,9 +30,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
+    // Restore token from sessionStorage on mount
+    const cached = sessionStorage.getItem("gmail_token");
+    if (cached) setAccessToken(cached);
+
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setUser(user);
       setLoading(false);
+      if (!user) {
+        sessionStorage.removeItem("gmail_token");
+        setAccessToken(null);
+      }
     });
     return unsubscribe;
   }, []);
@@ -43,6 +51,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const token = credential?.accessToken || null;
     if (token) {
       setAccessToken(token);
+      sessionStorage.setItem("gmail_token", token);
     }
     return token;
   };
@@ -50,6 +59,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const logout = async () => {
     await signOut(auth);
     setAccessToken(null);
+    sessionStorage.removeItem("gmail_token");
   };
 
   return (

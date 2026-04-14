@@ -65,13 +65,13 @@ export default function Stats() {
   return (
     <div className="w-full max-w-[420px] h-[72px] flex items-center justify-center">
       {showSuccess ? (
-        <div className="bg-[#f0f0f5] rounded-2xl px-6 py-4 animate-[fadeIn_0.3s_ease-out]">
-          <span className="text-[15px] font-medium text-[#86868b]">
+        <div className="w-full bg-[#e8f0fe] rounded-2xl py-4 flex items-center justify-center animate-[fadeIn_0.3s_ease-out]">
+          <span className="text-[15px] font-medium text-[#0071e3]">
             ✓ 발송 완료
           </span>
         </div>
       ) : (
-        <div className="bg-[#f0f0f5] rounded-2xl px-6 py-3 flex items-center gap-8 text-[12px] animate-[fadeIn_0.3s_ease-out]">
+        <div className="w-full bg-[#f0f0f5] rounded-2xl py-3 flex items-center justify-center gap-8 text-[12px] animate-[fadeIn_0.3s_ease-out]">
           <div className="flex flex-col items-center">
             <span className="text-[17px] font-semibold text-[#86868b]">{myCount}</span>
             <span className="text-[#aeaeb2]">오늘</span>
