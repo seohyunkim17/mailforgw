@@ -1,13 +1,20 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
-import { collection, getDocs, addDoc, Timestamp } from "firebase/firestore";
+import { collection, getDocs, addDoc, Timestamp, query, where } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { sendEmail } from "@/lib/gmail";
 import { useAuth } from "./AuthProvider";
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function getTodayMidnightKST(): Date {
+  const now = new Date();
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  kst.setUTCHours(0, 0, 0, 0);
+  return new Date(kst.getTime() - 9 * 60 * 60 * 1000);
 }
 
 export interface SendMailHandle {
@@ -24,6 +31,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
   const [cooldown, setCooldown] = useState(0);
   const [sendCount, setSendCount] = useState(0);
   const [showSwitchPopup, setShowSwitchPopup] = useState(false);
+  const [showLimitPopup, setShowLimitPopup] = useState(false);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [allSubjects, setAllSubjects] = useState<string[]>([]);
@@ -108,9 +116,27 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
         shuffle();
         const newCount = sendCount + 1;
         setSendCount(newCount);
-        if (newCount % 100 === 0) {
-          setShowSwitchPopup(true);
+
+        // Check daily limit by querying today's count
+        if (user) {
+          try {
+            const todayMidnight = getTodayMidnightKST();
+            const myQ = query(
+              collection(db, "sendLogs"),
+              where("userId", "==", user.uid),
+              where("sentAt", ">=", Timestamp.fromDate(todayMidnight))
+            );
+            const snap = await getDocs(myQ);
+            if (snap.size >= 500) {
+              setShowLimitPopup(true);
+            } else if (newCount % 100 === 0) {
+              setShowSwitchPopup(true);
+            }
+          } catch {
+            if (newCount % 100 === 0) setShowSwitchPopup(true);
+          }
         }
+
         setTimeout(() => { setStatus("idle"); }, 500);
       } else {
         setStatus("error");
@@ -152,6 +178,39 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
         <div className="fixed top-6 inset-x-0 z-50 pointer-events-none flex justify-center animate-[fadeInOut_0.5s_ease-in-out]">
           <div className="px-5 py-3 rounded-2xl text-[14px] font-medium bg-[#e8f0fe] text-[#0071e3]">
             ✓ 발송 완료
+          </div>
+        </div>
+      )}
+
+      {/* Daily limit popup */}
+      {showLimitPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 mx-6 max-w-[320px] w-full shadow-xl text-center">
+            <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">
+              오늘의 발송 한도에 도달했습니다
+            </p>
+            <p className="text-[13px] text-[#86868b] mb-5">
+              이 계정의 1일 발송 한도 500건을 모두 사용했습니다.<br />다른 계정으로 로그인하여 계속 보낼 수 있습니다.
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={async () => {
+                  setShowLimitPopup(false);
+                  setSendCount(0);
+                  await logout();
+                  await login();
+                }}
+                className="w-full py-3 bg-[#0071e3] text-white text-[15px] font-medium rounded-xl hover:bg-[#0077ED] active:scale-[0.98] transition-all"
+              >
+                다른 계정으로 로그인하여 계속하기
+              </button>
+              <button
+                onClick={() => setShowLimitPopup(false)}
+                className="w-full py-3 bg-[#f0f0f5] text-[#86868b] text-[15px] font-medium rounded-xl hover:bg-[#e8e8ed] active:scale-[0.98] transition-all"
+              >
+                닫기
+              </button>
+            </div>
           </div>
         </div>
       )}
