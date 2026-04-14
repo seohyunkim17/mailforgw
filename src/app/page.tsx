@@ -23,14 +23,17 @@ export default function Home() {
             mail to wakeone
           </h1>
           {user && (
-            <p className="mt-2 text-[13px] text-[#86868b]">{user.email}</p>
+            <div className="mt-2 flex items-center justify-center gap-2 text-[13px] text-[#86868b]">
+              <span>{user.email}</span>
+              <span>·</span>
+              <LoginButton />
+            </div>
           )}
         </div>
 
         {user ? (
           <div className="w-full flex flex-col items-center gap-5">
             <SendMailButton />
-            <LoginButton />
           </div>
         ) : (
           <LoginButton />
