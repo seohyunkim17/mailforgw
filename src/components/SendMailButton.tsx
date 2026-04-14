@@ -221,7 +221,7 @@ export default function SendMailButton() {
         <div
           className={`px-5 py-3 rounded-xl text-[14px] font-medium ${
             status === "success"
-              ? "bg-[#e8f5e9] text-[#1b5e20]"
+              ? "bg-[#e8f0fe] text-[#0071e3]"
               : "bg-[#ffeaea] text-[#ff3b30]"
           }`}
         >
