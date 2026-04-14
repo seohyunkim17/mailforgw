@@ -64,18 +64,10 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
   }, []);
 
   const startCooldown = () => {
-    setCooldown(2);
+    setCooldown(1);
     if (cooldownRef.current) clearInterval(cooldownRef.current);
-    cooldownRef.current = setInterval(() => {
-      setCooldown((prev) => {
-        if (prev <= 1) {
-          clearInterval(cooldownRef.current!);
-          cooldownRef.current = null;
-          return 0;
-        }
-        return prev - 1;
-      });
-    }, 1000);
+    const to = setTimeout(() => { setCooldown(0); }, 500);
+    cooldownRef.current = to as unknown as ReturnType<typeof setInterval>;
   };
 
   const handleSend = async () => {
@@ -116,10 +108,10 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
         shuffle();
         const newCount = sendCount + 1;
         setSendCount(newCount);
-        if (newCount % 10 === 0) {
+        if (newCount % 100 === 0) {
           setShowSwitchPopup(true);
         }
-        setTimeout(() => { setStatus("idle"); }, 2500);
+        setTimeout(() => { setStatus("idle"); }, 500);
       } else {
         setStatus("error");
         setErrorMsg(result.error || "발송 실패");
@@ -136,7 +128,6 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
 
   const buttonLabel = (() => {
     if (status === "sending") return "발송 중...";
-    if (cooldown > 0) return "대기 중";
     return "메일 보내기";
   })();
 
@@ -156,6 +147,15 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
 
   return (
     <>
+      {/* Success toast */}
+      {status === "success" && (
+        <div className="fixed top-6 inset-x-0 z-50 pointer-events-none flex justify-center animate-[fadeInOut_0.5s_ease-in-out]">
+          <div className="px-5 py-3 rounded-2xl text-[14px] font-medium bg-[#e8f0fe] text-[#0071e3]">
+            ✓ 발송 완료
+          </div>
+        </div>
+      )}
+
       {/* Switch account popup */}
       {showSwitchPopup && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
@@ -164,7 +164,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
               다른 계정으로 전환할까요?
             </p>
             <p className="text-[13px] text-[#86868b] mb-5">
-              10건 발송했습니다.<br />메일 주소 차단 방지를 위해 새 로그인을 권장합니다.
+              100건 발송했습니다.<br />메일 주소 차단 방지를 위해 새 로그인을 권장합니다.
             </p>
             <div className="flex flex-col gap-2">
               <button
