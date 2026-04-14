@@ -1,5 +1,5 @@
 const RECIPIENTS = [
-  "wakeione@wake-one.com",
+  "wakeone@wake-one.com",
   "protect@wake-one.com",
 ];
 
