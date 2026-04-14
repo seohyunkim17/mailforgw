@@ -1,14 +1,14 @@
 "use client";
 
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import { User, onAuthStateChanged, signInWithPopup, signOut } from "firebase/auth";
+import { User, onAuthStateChanged, signInWithPopup, signOut, GoogleAuthProvider } from "firebase/auth";
 import { auth, googleProvider } from "@/lib/firebase";
 
 interface AuthContextType {
   user: User | null;
   loading: boolean;
   accessToken: string | null;
-  login: () => Promise<void>;
+  login: () => Promise<string | null>;
   logout: () => Promise<void>;
 }
 
@@ -16,7 +16,7 @@ const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
   accessToken: null,
-  login: async () => {},
+  login: async () => null,
   logout: async () => {},
 });
 
@@ -37,12 +37,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return unsubscribe;
   }, []);
 
-  const login = async () => {
+  const login = async (): Promise<string | null> => {
     const result = await signInWithPopup(auth, googleProvider);
-    const credential = (await import("firebase/auth")).GoogleAuthProvider.credentialFromResult(result);
-    if (credential?.accessToken) {
-      setAccessToken(credential.accessToken);
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    const token = credential?.accessToken || null;
+    if (token) {
+      setAccessToken(token);
     }
+    return token;
   };
 
   const logout = async () => {

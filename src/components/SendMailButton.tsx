@@ -126,9 +126,10 @@ export default function SendMailButton() {
   };
 
   const handleSend = async () => {
-    if (!accessToken) {
-      await login();
-      return;
+    let token = accessToken;
+    if (!token) {
+      token = await login();
+      if (!token) return;
     }
 
     if (!previewSubject || !previewBody) {
@@ -142,7 +143,7 @@ export default function SendMailButton() {
     setMessage("");
 
     try {
-      const result = await sendEmail(accessToken, user!.email!, previewSubject, previewBody);
+      const result = await sendEmail(token, user!.email!, previewSubject, previewBody);
 
       if (result.success) {
         setStatus("success");
