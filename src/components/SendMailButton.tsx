@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { collection, getDocs, addDoc, query, where, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { sendEmail } from "@/lib/gmail";
@@ -12,9 +12,9 @@ function pickRandom<T>(arr: T[]): T {
 
 function getTodayMidnightKST(): Date {
   const now = new Date();
-  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000); // UTC+9
-  kst.setUTCHours(0, 0, 0, 0); // midnight KST in UTC representation
-  return new Date(kst.getTime() - 9 * 60 * 60 * 1000); // back to UTC
+  const kst = new Date(now.getTime() + 9 * 60 * 60 * 1000);
+  kst.setUTCHours(0, 0, 0, 0);
+  return new Date(kst.getTime() - 9 * 60 * 60 * 1000);
 }
 
 export default function SendMailButton() {
@@ -25,13 +25,52 @@ export default function SendMailButton() {
   const [todayCount, setTodayCount] = useState<number | null>(null);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Fetch today's send count on mount (and when user changes)
+  // Preview state
+  const [allSubjects, setAllSubjects] = useState<string[]>([]);
+  const [allBodies, setAllBodies] = useState<string[]>([]);
+  const [previewSubject, setPreviewSubject] = useState("");
+  const [previewBody, setPreviewBody] = useState("");
+  const [dataLoaded, setDataLoaded] = useState(false);
+
+  // Fetch subjects/bodies from Firestore
+  const fetchData = useCallback(async () => {
+    try {
+      const [subjectsSnap, bodiesSnap] = await Promise.all([
+        getDocs(collection(db, "subjects")),
+        getDocs(collection(db, "bodies")),
+      ]);
+      const subjects = subjectsSnap.docs.map((d) => d.data().text as string);
+      const bodies = bodiesSnap.docs.map((d) => d.data().text as string);
+      setAllSubjects(subjects);
+      setAllBodies(bodies);
+      setDataLoaded(true);
+
+      if (subjects.length > 0 && bodies.length > 0) {
+        setPreviewSubject(pickRandom(subjects));
+        setPreviewBody(pickRandom(bodies));
+      }
+    } catch {
+      setDataLoaded(true);
+    }
+  }, []);
+
+  // Load data on mount
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  // Shuffle preview
+  const shuffle = () => {
+    if (allSubjects.length > 0) setPreviewSubject(pickRandom(allSubjects));
+    if (allBodies.length > 0) setPreviewBody(pickRandom(allBodies));
+  };
+
+  // Fetch today's send count
   useEffect(() => {
     if (!user) {
       setTodayCount(null);
       return;
     }
-
     const fetchCount = async () => {
       try {
         const todayMidnight = getTodayMidnightKST();
@@ -46,11 +85,9 @@ export default function SendMailButton() {
         setTodayCount(0);
       }
     };
-
     fetchCount();
   }, [user]);
 
-  // Cleanup interval on unmount
   useEffect(() => {
     return () => {
       if (cooldownRef.current) clearInterval(cooldownRef.current);
@@ -78,35 +115,23 @@ export default function SendMailButton() {
       return;
     }
 
+    if (!previewSubject || !previewBody) {
+      setStatus("error");
+      setMessage("등록된 제목 또는 내용이 없습니다.");
+      setTimeout(() => { setStatus("idle"); setMessage(""); }, 3000);
+      return;
+    }
+
     setStatus("sending");
     setMessage("");
 
     try {
-      const [subjectsSnap, bodiesSnap] = await Promise.all([
-        getDocs(collection(db, "subjects")),
-        getDocs(collection(db, "bodies")),
-      ]);
-
-      const subjects = subjectsSnap.docs.map((d) => d.data().text as string);
-      const bodies = bodiesSnap.docs.map((d) => d.data().text as string);
-
-      if (subjects.length === 0 || bodies.length === 0) {
-        setStatus("error");
-        setMessage("등록된 제목 또는 내용이 없습니다. 관리자에게 문의하세요.");
-        setTimeout(() => { setStatus("idle"); setMessage(""); }, 3000);
-        return;
-      }
-
-      const subject = pickRandom(subjects);
-      const body = pickRandom(bodies);
-
-      const result = await sendEmail(accessToken, user!.email!, subject, body);
+      const result = await sendEmail(accessToken, user!.email!, previewSubject, previewBody);
 
       if (result.success) {
         setStatus("success");
-        setMessage("메일 발송 완료!");
+        setMessage("발송 완료");
 
-        // Log to Firestore and update local count
         if (user) {
           try {
             await addDoc(collection(db, "sendLogs"), {
@@ -116,11 +141,13 @@ export default function SendMailButton() {
             });
             setTodayCount((prev) => (prev === null ? 1 : prev + 1));
           } catch {
-            // Non-critical: count logging failure should not affect UX
+            // Non-critical
           }
         }
 
         startCooldown();
+        // Shuffle for next send
+        shuffle();
       } else {
         setStatus("error");
         setMessage(result.error || "발송 실패");
@@ -140,31 +167,69 @@ export default function SendMailButton() {
 
   const buttonLabel = () => {
     if (status === "sending") return "발송 중...";
-    if (cooldown > 0) return `${cooldown}초 후 재발송 가능`;
+    if (cooldown > 0) return `${cooldown}초`;
     return "메일 보내기";
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
+    <div className="w-full flex flex-col items-center gap-5">
+      {/* Preview card */}
+      {dataLoaded && previewSubject && previewBody && (
+        <div className="w-full max-w-[340px] bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-[11px] font-medium text-[#86868b] uppercase tracking-wide">
+              미리보기
+            </span>
+            <button
+              onClick={shuffle}
+              className="text-[12px] text-[#0071e3] hover:text-[#0077ED] font-medium transition-colors"
+            >
+              새로고침
+            </button>
+          </div>
+          <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">
+            {previewSubject}
+          </p>
+          <p className="text-[13px] text-[#6e6e73] leading-relaxed whitespace-pre-wrap">
+            {previewBody}
+          </p>
+        </div>
+      )}
+
+      {dataLoaded && !previewSubject && !previewBody && (
+        <p className="text-[13px] text-[#86868b]">
+          등록된 제목/내용이 없습니다.
+        </p>
+      )}
+
       <button
         onClick={handleSend}
         disabled={isDisabled}
-        className="px-8 py-4 bg-green-600 text-white text-lg font-bold rounded-xl hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        className={`
+          w-full max-w-[280px] py-4 text-[17px] font-semibold rounded-2xl
+          transition-all active:scale-[0.97]
+          ${isDisabled
+            ? "bg-[#d2d2d7] text-white cursor-not-allowed"
+            : "bg-[#1d1d1f] text-white hover:bg-[#000000]"
+          }
+        `}
       >
         {buttonLabel()}
       </button>
+
       {message && (
         <p
-          className={`text-sm font-medium ${
-            status === "success" ? "text-green-600" : "text-red-600"
+          className={`text-[13px] font-medium ${
+            status === "success" ? "text-[#34c759]" : "text-[#ff3b30]"
           }`}
         >
           {message}
         </p>
       )}
+
       {user && todayCount !== null && (
-        <p className="text-sm text-gray-500">
-          오늘 발송: {todayCount} / 500건
+        <p className="text-[13px] text-[#86868b]">
+          오늘 {todayCount}건 발송 · 잔여 {Math.max(500 - todayCount, 0)}건
         </p>
       )}
     </div>

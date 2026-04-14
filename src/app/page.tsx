@@ -9,28 +9,39 @@ export default function Home() {
 
   if (loading) {
     return (
-      <main className="min-h-screen flex items-center justify-center">
-        <p className="text-gray-400">로딩 중...</p>
+      <main className="min-h-screen flex items-center justify-center bg-[#fbfbfd]">
+        <div className="w-5 h-5 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin" />
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center p-4 gap-6">
-      <h1 className="text-2xl font-bold">mail to wakeone</h1>
-      {user ? (
-        <>
-          <div className="flex items-center gap-3">
-            <span className="text-sm text-gray-600">{user.email}</span>
+    <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#fbfbfd]">
+      <div className="w-full max-w-sm flex flex-col items-center gap-8">
+        <div className="text-center">
+          <h1 className="text-[28px] font-semibold tracking-tight text-[#1d1d1f]">
+            mail to wakeone
+          </h1>
+          {user && (
+            <p className="mt-2 text-[13px] text-[#86868b]">{user.email}</p>
+          )}
+        </div>
+
+        {user ? (
+          <div className="w-full flex flex-col items-center gap-5">
+            <SendMailButton />
             <LoginButton />
           </div>
-          <SendMailButton />
-        </>
-      ) : (
-        <LoginButton />
-      )}
-      <footer className="fixed bottom-4 right-4">
-        <a href="/admin" className="text-xs text-gray-400 hover:text-gray-600">
+        ) : (
+          <LoginButton />
+        )}
+      </div>
+
+      <footer className="fixed bottom-5 right-5">
+        <a
+          href="/admin"
+          className="text-[11px] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+        >
           관리자
         </a>
       </footer>

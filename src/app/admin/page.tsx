@@ -33,42 +33,50 @@ export default function AdminPage() {
 
   if (!authenticated) {
     return (
-      <main className="min-h-screen flex flex-col items-center justify-center p-4 gap-4">
-        <h1 className="text-xl font-bold">관리자 로그인</h1>
+      <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#fbfbfd] gap-5">
+        <h1 className="text-[22px] font-semibold tracking-tight text-[#1d1d1f]">
+          관리자
+        </h1>
         <input
           type="password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           onKeyDown={handleKeyDown}
-          placeholder="비밀번호 입력"
-          className="border rounded px-4 py-2"
+          placeholder="비밀번호"
+          className="w-full max-w-[280px] px-4 py-3 text-[15px] bg-[#f5f5f7] rounded-xl border-none outline-none focus:ring-2 focus:ring-[#0071e3] placeholder:text-[#86868b]"
         />
         <button
           onClick={handleLogin}
-          className="px-6 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+          className="w-full max-w-[280px] py-3 bg-[#0071e3] text-white text-[15px] font-medium rounded-xl hover:bg-[#0077ED] active:scale-[0.98] transition-all"
         >
           확인
         </button>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && (
+          <p className="text-[13px] text-[#ff3b30]">{error}</p>
+        )}
       </main>
     );
   }
 
   return (
-    <main className="min-h-screen p-6 max-w-4xl mx-auto">
-      <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">관리자 페이지</h1>
-        <button
-          onClick={() => {
-            localStorage.removeItem("admin_auth");
-            setAuthenticated(false);
-          }}
-          className="text-sm text-gray-500 hover:text-gray-700"
-        >
-          로그아웃
-        </button>
+    <main className="min-h-screen bg-[#fbfbfd] p-6">
+      <div className="max-w-4xl mx-auto">
+        <div className="flex items-center justify-between mb-8">
+          <h1 className="text-[22px] font-semibold tracking-tight text-[#1d1d1f]">
+            관리자
+          </h1>
+          <button
+            onClick={() => {
+              localStorage.removeItem("admin_auth");
+              setAuthenticated(false);
+            }}
+            className="text-[13px] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
+          >
+            로그아웃
+          </button>
+        </div>
+        <AdminPanel />
       </div>
-      <AdminPanel />
     </main>
   );
 }
