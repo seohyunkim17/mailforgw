@@ -18,10 +18,12 @@ export interface SendMailHandle {
 }
 
 const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref) {
-  const { user, accessToken, login } = useAuth();
+  const { user, accessToken, login, logout } = useAuth();
   const [status, setStatus] = useState<"idle" | "sending" | "success" | "error">("idle");
   const [errorMsg, setErrorMsg] = useState("");
   const [cooldown, setCooldown] = useState(0);
+  const [sendCount, setSendCount] = useState(0);
+  const [showSwitchPopup, setShowSwitchPopup] = useState(false);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const [allSubjects, setAllSubjects] = useState<string[]>([]);
@@ -112,6 +114,11 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
 
         startCooldown();
         shuffle();
+        const newCount = sendCount + 1;
+        setSendCount(newCount);
+        if (newCount % 10 === 0) {
+          setShowSwitchPopup(true);
+        }
         setTimeout(() => { setStatus("idle"); }, 2500);
       } else {
         setStatus("error");
@@ -140,7 +147,43 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
     buttonLabel,
   }));
 
+  const handleSwitch = async () => {
+    setShowSwitchPopup(false);
+    setSendCount(0);
+    await logout();
+    await login();
+  };
+
   return (
+    <>
+      {/* Switch account popup */}
+      {showSwitchPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 backdrop-blur-sm">
+          <div className="bg-white rounded-2xl p-6 mx-6 max-w-[320px] w-full shadow-xl text-center">
+            <p className="text-[15px] font-semibold text-[#1d1d1f] mb-2">
+              다른 계정으로 전환할까요?
+            </p>
+            <p className="text-[13px] text-[#86868b] mb-5">
+              10건 발송했습니다. 다른 계정으로 로그인하면 더 많이 보낼 수 있어요.
+            </p>
+            <div className="flex flex-col gap-2">
+              <button
+                onClick={handleSwitch}
+                className="w-full py-3 bg-[#0071e3] text-white text-[15px] font-medium rounded-xl hover:bg-[#0077ED] active:scale-[0.98] transition-all"
+              >
+                다른 계정으로 로그인
+              </button>
+              <button
+                onClick={() => setShowSwitchPopup(false)}
+                className="w-full py-3 bg-[#f0f0f5] text-[#86868b] text-[15px] font-medium rounded-xl hover:bg-[#e8e8ed] active:scale-[0.98] transition-all"
+              >
+                아니오
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     <div className="w-full">
       {dataLoaded && previewSubject && previewBody && (
         <div className="w-full bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
@@ -163,6 +206,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
         <p className="mt-3 text-[13px] text-[#ff3b30] font-medium text-center">{errorMsg}</p>
       )}
     </div>
+    </>
   );
 });
 
