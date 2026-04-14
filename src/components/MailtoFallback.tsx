@@ -43,9 +43,9 @@ export default function MailtoFallback() {
     <button
       onClick={handleClick}
       disabled={loading}
-      className="text-[12px] text-[#86868b] hover:text-[#1d1d1f] underline underline-offset-2 transition-colors disabled:opacity-50"
+      className="w-full max-w-[280px] px-6 py-3 bg-[#f0f0f5] text-[#86868b] text-[15px] font-medium rounded-xl hover:bg-[#e8e8ed] active:scale-[0.98] transition-all disabled:opacity-50"
     >
-      {loading ? "불러오는 중..." : "로그인이 안 되시나요? 메일 앱으로 바로 열기"}
+      {loading ? "불러오는 중..." : "로그인 불가 시 클릭"}
     </button>
   );
 }
