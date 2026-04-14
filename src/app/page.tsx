@@ -6,8 +6,19 @@ import SendMailButton, { SendMailHandle } from "@/components/SendMailButton";
 import Stats from "@/components/Stats";
 import { useAuth } from "@/components/AuthProvider";
 
+function isInAppBrowser(): boolean {
+  if (typeof window === "undefined") return false;
+  const ua = navigator.userAgent || "";
+  return /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line|DaumApps|everytimeApp/i.test(ua);
+}
+
 export default function Home() {
   const { user, loading } = useAuth();
+  const [inApp, setInApp] = useState(false);
+
+  useEffect(() => {
+    setInApp(isInAppBrowser());
+  }, []);
   const sendRef = useRef<SendMailHandle>(null);
   const [btnState, setBtnState] = useState({ disabled: false, label: "메일 보내기" });
 
@@ -39,9 +50,35 @@ export default function Home() {
         <h1 className="text-[28px] font-semibold tracking-tight text-[#1d1d1f]">
           to wakeone
         </h1>
-        <div className="mt-8">
-          <LoginButton />
-        </div>
+        {inApp ? (
+          <div className="mt-6 text-center">
+            <p className="text-[14px] text-[#86868b] mb-4 leading-relaxed">
+              인앱 브라우저에서는 Google 로그인이<br />지원되지 않습니다.
+            </p>
+            <button
+              onClick={() => {
+                window.location.href = `intent://${window.location.host}${window.location.pathname}#Intent;scheme=https;package=com.android.chrome;end`;
+              }}
+              className="w-full max-w-[280px] px-6 py-3 bg-[#1d1d1f] text-white text-[15px] font-medium rounded-xl active:scale-[0.98] transition-all mb-3"
+            >
+              Chrome으로 열기
+            </button>
+            <button
+              onClick={() => {
+                const url = window.location.href;
+                navigator.clipboard.writeText(url);
+                alert("링크가 복사되었습니다. Safari 또는 Chrome에 붙여넣기 해주세요.");
+              }}
+              className="w-full max-w-[280px] px-6 py-3 bg-[#f0f0f5] text-[#86868b] text-[15px] font-medium rounded-xl active:scale-[0.98] transition-all"
+            >
+              링크 복사
+            </button>
+          </div>
+        ) : (
+          <div className="mt-8">
+            <LoginButton />
+          </div>
+        )}
       </main>
     );
   }
