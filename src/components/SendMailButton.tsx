@@ -74,7 +74,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
   const startCooldown = () => {
     setCooldown(1);
     if (cooldownRef.current) clearInterval(cooldownRef.current);
-    const to = setTimeout(() => { setCooldown(0); }, 500);
+    const to = setTimeout(() => { setCooldown(0); }, 100);
     cooldownRef.current = to as unknown as ReturnType<typeof setInterval>;
   };
 
@@ -133,7 +133,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
           } catch { /* ignore */ }
         }
 
-        setTimeout(() => { setStatus("idle"); }, 500);
+        setTimeout(() => { setStatus("idle"); }, 300);
       } else {
         setStatus("error");
         setErrorMsg(result.error || "발송 실패");
@@ -171,7 +171,11 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
     <>
       {/* Success toast */}
       {status === "success" && (
-        <div className="fixed top-6 inset-x-0 z-50 pointer-events-none flex justify-center animate-[fadeInOut_0.5s_ease-in-out]">
+        <div
+          key={`toast-${sendCount}`}
+          className="fixed top-6 inset-x-0 z-50 pointer-events-none flex justify-center"
+          style={{ animation: "toastSlide 0.3s cubic-bezier(0.25, 0.1, 0.25, 1) forwards" }}
+        >
           <div className="px-5 py-3 rounded-2xl text-[14px] font-medium bg-[#e8f0fe] text-[#0071e3]">
             ✓ 발송 완료
           </div>

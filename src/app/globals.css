@@ -23,9 +23,9 @@ body {
   100% { opacity: 1; }
 }
 
-@keyframes fadeInOut {
-  0% { opacity: 0; transform: translateY(-8px); }
-  10% { opacity: 1; transform: translateY(0); }
+@keyframes toastSlide {
+  0% { opacity: 0; transform: translateY(-20px); }
+  20% { opacity: 1; transform: translateY(0); }
   80% { opacity: 1; transform: translateY(0); }
-  100% { opacity: 0; transform: translateY(-8px); }
+  100% { opacity: 0; transform: translateY(-12px); }
 }
