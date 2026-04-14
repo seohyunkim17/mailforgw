@@ -109,7 +109,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
           setToasts((prev) => [...prev, toastId]);
           setTimeout(() => {
             setToasts((prev) => prev.filter((id) => id !== toastId));
-          }, 1000);
+          }, 1500);
 
           if (user) {
             try {
@@ -170,7 +170,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
         {toasts.map((id) => (
           <div
             key={id}
-            style={{ animation: "toastSlide 1s cubic-bezier(0.16, 1, 0.3, 1) forwards" }}
+            style={{ animation: "toastSlide 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards" }}
           >
             <div className="px-5 py-3 rounded-2xl text-[14px] font-medium bg-[#e8f0fe] text-[#0071e3]">
               ✓ 발송 완료
