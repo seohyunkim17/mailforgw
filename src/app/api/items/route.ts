@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase-admin";
 
 export const runtime = "nodejs";
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 async function fetchCollection(name: "subjects" | "bodies"): Promise<string[]> {
   const db = getAdminDb();
