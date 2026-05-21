@@ -1,59 +1,52 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import AdminPanel from "@/components/AdminPanel";
+import { useAuth } from "@/components/AuthProvider";
 
-const ADMIN_PASSWORD = "Forgw03!";
+const ADMIN_EMAIL = "411@comebackgw.cloud";
 
 export default function AdminPage() {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const { user, loading, login, logout } = useAuth();
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("admin_auth");
-      if (stored === "true") setAuthenticated(true);
-    }
-  }, []);
+  if (loading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center bg-[#fbfbfd]">
+        <p className="text-[14px] text-[#86868b]">불러오는 중...</p>
+      </main>
+    );
+  }
 
-  const handleLogin = () => {
-    if (password === ADMIN_PASSWORD) {
-      setAuthenticated(true);
-      localStorage.setItem("admin_auth", "true");
-      setError("");
-    } else {
-      setError("비밀번호가 틀렸습니다.");
-    }
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") handleLogin();
-  };
-
-  if (!authenticated) {
+  if (!user) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#fbfbfd] gap-5">
         <h1 className="text-[22px] font-semibold tracking-tight text-[#1d1d1f]">
           관리자
         </h1>
-        <input
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          onKeyDown={handleKeyDown}
-          placeholder="비밀번호"
-          className="w-full max-w-[280px] px-4 py-3 text-[16px] bg-[#f5f5f7] rounded-xl border-none outline-none focus:ring-2 focus:ring-[#0071e3] placeholder:text-[#86868b]"
-        />
         <button
-          onClick={handleLogin}
+          onClick={() => { void login(); }}
           className="w-full max-w-[280px] py-3 bg-[#0071e3] text-white text-[15px] font-medium rounded-xl hover:bg-[#0077ED] active:scale-[0.98] transition-all"
         >
-          확인
+          Google 로그인
         </button>
-        {error && (
-          <p className="text-[13px] text-[#ff3b30]">{error}</p>
-        )}
+      </main>
+    );
+  }
+
+  if (user.email !== ADMIN_EMAIL) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#fbfbfd] gap-5">
+        <h1 className="text-[22px] font-semibold tracking-tight text-[#1d1d1f]">
+          권한 없음
+        </h1>
+        <p className="text-[14px] text-[#86868b]">
+          {user.email} 계정은 관리자가 아닙니다.
+        </p>
+        <button
+          onClick={() => { void logout(); }}
+          className="w-full max-w-[280px] py-3 bg-[#0071e3] text-white text-[15px] font-medium rounded-xl hover:bg-[#0077ED] active:scale-[0.98] transition-all"
+        >
+          로그아웃
+        </button>
       </main>
     );
   }
@@ -66,10 +59,7 @@ export default function AdminPage() {
             관리자
           </h1>
           <button
-            onClick={() => {
-              localStorage.removeItem("admin_auth");
-              setAuthenticated(false);
-            }}
+            onClick={() => { void logout(); }}
             className="text-[13px] text-[#86868b] hover:text-[#1d1d1f] transition-colors"
           >
             로그아웃
