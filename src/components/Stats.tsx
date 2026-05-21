@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, getDocs, query, where, Timestamp } from "firebase/firestore";
+import { collection, getCountFromServer, query, where, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "./AuthProvider";
 
@@ -37,11 +37,11 @@ export default function Stats() {
           where("sentAt", ">=", Timestamp.fromDate(todayMidnight))
         );
         const [mySnap, totalSnap] = await Promise.all([
-          getDocs(myQ),
-          getDocs(collection(db, "sendLogs")),
+          getCountFromServer(myQ),
+          getCountFromServer(collection(db, "sendLogs")),
         ]);
-        setMyCount(mySnap.size);
-        setTotalCount(totalSnap.size);
+        setMyCount(mySnap.data().count);
+        setTotalCount(totalSnap.data().count);
       } catch {
         setMyCount(0);
         setTotalCount(0);
