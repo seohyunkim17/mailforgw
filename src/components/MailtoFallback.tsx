@@ -1,10 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { collection, getDocs } from "firebase/firestore";
-import { db } from "@/lib/firebase";
 
 const RECIPIENTS = "wakeone@wake-one.com,protect@wake-one.com";
+
+type ItemsResponse = { subjects: string[]; bodies: string[] };
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -16,12 +16,9 @@ export default function MailtoFallback() {
   const handleClick = async () => {
     setLoading(true);
     try {
-      const [subjectsSnap, bodiesSnap] = await Promise.all([
-        getDocs(collection(db, "subjects")),
-        getDocs(collection(db, "bodies")),
-      ]);
-      const subjects = subjectsSnap.docs.map((d) => d.data().text as string);
-      const bodies = bodiesSnap.docs.map((d) => d.data().text as string);
+      const res = await fetch("/api/items", { cache: "no-store" });
+      if (!res.ok) throw new Error(`items ${res.status}`);
+      const { subjects, bodies } = (await res.json()) as ItemsResponse;
 
       if (subjects.length === 0 || bodies.length === 0) {
         alert("등록된 제목/내용이 없습니다.");
