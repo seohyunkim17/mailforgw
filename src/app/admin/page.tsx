@@ -3,7 +3,11 @@
 import AdminPanel from "@/components/AdminPanel";
 import { useAuth } from "@/components/AuthProvider";
 
-const ADMIN_EMAIL = "411@comebackgw.cloud";
+const ADMIN_EMAILS = [
+  "411@comebackgw.cloud",
+  "my.westhk@gmail.com",
+  "comebackgw411@gmail.com",
+];
 
 export default function AdminPage() {
   const { user, loading, login, logout } = useAuth();
@@ -32,7 +36,7 @@ export default function AdminPage() {
     );
   }
 
-  if (user.email !== ADMIN_EMAIL) {
+  if (!user.email || !ADMIN_EMAILS.includes(user.email)) {
     return (
       <main className="min-h-screen flex flex-col items-center justify-center p-6 bg-[#fbfbfd] gap-5">
         <h1 className="text-[22px] font-semibold tracking-tight text-[#1d1d1f]">
