@@ -1,6 +1,6 @@
 import { initializeApp, getApps } from "firebase/app";
 import { getAuth, GoogleAuthProvider } from "firebase/auth";
-import { getFirestore } from "firebase/firestore";
+import { initializeFirestore, getFirestore, type Firestore } from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
@@ -13,7 +13,14 @@ const firebaseConfig = {
 
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApps()[0];
 
+let firestore: Firestore;
+try {
+  firestore = initializeFirestore(app, { experimentalAutoDetectLongPolling: true });
+} catch {
+  firestore = getFirestore(app);
+}
+
 export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const db = firestore;
 export const googleProvider = new GoogleAuthProvider();
 googleProvider.addScope("https://www.googleapis.com/auth/gmail.send");
