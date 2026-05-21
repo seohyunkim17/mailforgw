@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
 import { collection, getDocs, addDoc, Timestamp, query, where } from "firebase/firestore";
-type ItemsResponse = { subjects: string[]; bodies: string[] };
+import { fetchItems } from "@/lib/items";
 import { db } from "@/lib/firebase";
 import { sendEmail } from "@/lib/gmail";
 import { useAuth } from "./AuthProvider";
@@ -44,9 +44,7 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await fetch("/api/items", { cache: "no-store" });
-      if (!res.ok) throw new Error(`items ${res.status}`);
-      const { subjects, bodies } = (await res.json()) as ItemsResponse;
+      const { subjects, bodies } = await fetchItems();
       setAllSubjects(subjects);
       setAllBodies(bodies);
       setDataLoaded(true);

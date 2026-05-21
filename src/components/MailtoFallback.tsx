@@ -1,10 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import { fetchItems } from "@/lib/items";
 
 const RECIPIENTS = "wakeone@wake-one.com,protect@wake-one.com";
-
-type ItemsResponse = { subjects: string[]; bodies: string[] };
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];
@@ -16,9 +15,7 @@ export default function MailtoFallback() {
   const handleClick = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/items", { cache: "no-store" });
-      if (!res.ok) throw new Error(`items ${res.status}`);
-      const { subjects, bodies } = (await res.json()) as ItemsResponse;
+      const { subjects, bodies } = await fetchItems();
 
       if (subjects.length === 0 || bodies.length === 0) {
         alert("등록된 제목/내용이 없습니다.");
