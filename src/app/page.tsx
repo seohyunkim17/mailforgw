@@ -6,6 +6,7 @@ import SendMailButton, { SendMailHandle } from "@/components/SendMailButton";
 import Stats from "@/components/Stats";
 import MailtoFallback from "@/components/MailtoFallback";
 import { useAuth } from "@/components/AuthProvider";
+import { LANGS, DEFAULT_LANG, isLangCode, type LangCode } from "@/lib/langs";
 
 function isInAppBrowser(): boolean {
   if (typeof window === "undefined") return false;
@@ -15,6 +16,20 @@ function isInAppBrowser(): boolean {
 
 export default function Home() {
   const { user, loading } = useAuth();
+  const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("mailforgw:lang");
+      if (isLangCode(saved)) setLang(saved);
+    } catch { /* ignore */ }
+  }, []);
+
+  const changeLang = useCallback((next: LangCode) => {
+    setLang(next);
+    try { localStorage.setItem("mailforgw:lang", next); } catch { /* ignore */ }
+  }, []);
+
   const [inApp, setInApp] = useState(false);
 
   useEffect(() => {
@@ -111,7 +126,24 @@ export default function Home() {
               <LoginButton />
             </div>
           </div>
-          <SendMailButton ref={sendRef} />
+
+          <div className="w-full flex gap-1 bg-[#f0f0f5] rounded-xl p-1 mb-5">
+            {LANGS.map((l) => (
+              <button
+                key={l.code}
+                onClick={() => changeLang(l.code)}
+                className={`flex-1 py-2 rounded-[9px] text-[13px] font-medium transition-all ${
+                  lang === l.code
+                    ? "bg-[#1d1d1f] text-white"
+                    : "text-[#86868b] active:scale-[0.97]"
+                }`}
+              >
+                {l.label}
+              </button>
+            ))}
+          </div>
+
+          <SendMailButton ref={sendRef} lang={lang} />
         </div>
       </main>
 
