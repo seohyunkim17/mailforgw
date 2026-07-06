@@ -94,7 +94,7 @@ function ItemManager({
             key={item.id}
             className="flex items-start justify-between gap-3 p-3 bg-white rounded-xl shadow-[0_1px_4px_rgba(0,0,0,0.04)] text-[14px]"
           >
-            <span className="break-all text-[#1d1d1f] leading-relaxed whitespace-pre-wrap">{item.text}</span>
+            <span lang={lang} className="break-all text-[#1d1d1f] leading-relaxed whitespace-pre-wrap">{item.text}</span>
             <button
               onClick={() => handleDelete(item.id)}
               className="text-[#ff3b30] hover:text-[#ff453a] text-[12px] font-medium whitespace-nowrap mt-0.5 transition-colors"
@@ -123,6 +123,7 @@ export default function AdminPanel() {
           <button
             key={l.code}
             onClick={() => setLang(l.code)}
+            lang={l.code}
             className={`flex-1 py-2 rounded-[9px] text-[13px] font-medium transition-all ${
               lang === l.code
                 ? "bg-[#1d1d1f] text-white"

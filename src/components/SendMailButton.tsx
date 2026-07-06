@@ -259,7 +259,7 @@ const SendMailButton = forwardRef<SendMailHandle, SendMailButtonProps>(
 
     <div className="w-full">
       {dataLoaded && previewSubject && previewBody && (
-        <div className="w-full bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
+        <div lang={lang} className="w-full bg-white rounded-2xl p-5 shadow-[0_2px_12px_rgba(0,0,0,0.06)]">
           <p className="text-[12.8px] font-bold text-[#4b4b4b] pb-[10px] text-center">
             {previewSubject}
           </p>

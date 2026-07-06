@@ -132,6 +132,7 @@ export default function Home() {
               <button
                 key={l.code}
                 onClick={() => changeLang(l.code)}
+                lang={l.code}
                 className={`flex-1 py-2 rounded-[9px] text-[13px] font-medium transition-all ${
                   lang === l.code
                     ? "bg-[#1d1d1f] text-white"
