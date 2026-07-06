@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { fetchItems } from "@/lib/items";
+import { DEFAULT_LANG } from "@/lib/langs";
 
 const RECIPIENTS = "wakeone@wake-one.com,protect@wake-one.com";
 
@@ -15,7 +16,7 @@ export default function MailtoFallback() {
   const handleClick = async () => {
     setLoading(true);
     try {
-      const { subjects, bodies } = await fetchItems();
+      const { subjects, bodies } = (await fetchItems())[DEFAULT_LANG];
 
       if (subjects.length === 0 || bodies.length === 0) {
         alert("등록된 제목/내용이 없습니다.");
