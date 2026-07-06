@@ -2,7 +2,9 @@
 
 import { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
 import { collection, getDocs, addDoc, Timestamp, query, where } from "firebase/firestore";
-import { fetchItems } from "@/lib/items";
+import { fetchItems, type ItemsByLang } from "@/lib/items";
+import { emptyItemsByLang } from "@/lib/items";
+import type { LangCode } from "@/lib/langs";
 import { db } from "@/lib/firebase";
 import { sendEmail } from "@/lib/gmail";
 import { useAuth } from "./AuthProvider";
@@ -25,7 +27,12 @@ export interface SendMailHandle {
   buttonLabel: string;
 }
 
-const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref) {
+interface SendMailButtonProps {
+  lang: LangCode;
+}
+
+const SendMailButton = forwardRef<SendMailHandle, SendMailButtonProps>(
+  function SendMailButton({ lang }, ref) {
   const { user, accessToken, login, logout } = useAuth();
   const [errorMsg, setErrorMsg] = useState("");
   const [cooldown, setCooldown] = useState(0);
@@ -36,33 +43,47 @@ const SendMailButton = forwardRef<SendMailHandle>(function SendMailButton(_, ref
   const toastIdRef = useRef(0);
   const cooldownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const [allSubjects, setAllSubjects] = useState<string[]>([]);
-  const [allBodies, setAllBodies] = useState<string[]>([]);
+  const [itemsByLang, setItemsByLang] = useState<ItemsByLang>(emptyItemsByLang());
   const [previewSubject, setPreviewSubject] = useState("");
   const [previewBody, setPreviewBody] = useState("");
   const [dataLoaded, setDataLoaded] = useState(false);
 
+  const curSubjects = itemsByLang[lang].subjects;
+  const curBodies = itemsByLang[lang].bodies;
+
   const fetchData = useCallback(async () => {
     try {
-      const { subjects, bodies } = await fetchItems();
-      setAllSubjects(subjects);
-      setAllBodies(bodies);
+      const data = await fetchItems();
+      setItemsByLang(data);
       setDataLoaded(true);
-      if (subjects.length > 0 && bodies.length > 0) {
-        setPreviewSubject(pickRandom(subjects));
-        setPreviewBody(pickRandom(bodies));
+      const s = data[lang].subjects;
+      const b = data[lang].bodies;
+      if (s.length > 0 && b.length > 0) {
+        setPreviewSubject(pickRandom(s));
+        setPreviewBody(pickRandom(b));
       }
     } catch {
       setDataLoaded(true);
     }
-  }, []);
+  }, [lang]);
 
   useEffect(() => { fetchData(); }, [fetchData]);
 
-  const shuffle = () => {
-    if (allSubjects.length > 0) setPreviewSubject(pickRandom(allSubjects));
-    if (allBodies.length > 0) setPreviewBody(pickRandom(allBodies));
-  };
+  useEffect(() => {
+    if (!dataLoaded) return;
+    const s = itemsByLang[lang].subjects;
+    const b = itemsByLang[lang].bodies;
+    setPreviewSubject(s.length > 0 ? pickRandom(s) : "");
+    setPreviewBody(b.length > 0 ? pickRandom(b) : "");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang, dataLoaded]);
+
+  const shuffle = useCallback(() => {
+    const s = itemsByLang[lang].subjects;
+    const b = itemsByLang[lang].bodies;
+    if (s.length > 0) setPreviewSubject(pickRandom(s));
+    if (b.length > 0) setPreviewBody(pickRandom(b));
+  }, [itemsByLang, lang]);
 
   useEffect(() => {
     return () => { if (cooldownRef.current) clearInterval(cooldownRef.current); };
