@@ -2,8 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
 import { collection, getDocs, addDoc, Timestamp, query, where } from "firebase/firestore";
-import { fetchItems, type ItemsByLang } from "@/lib/items";
-import { emptyItemsByLang } from "@/lib/items";
+import { fetchItems, emptyItemsByLang, type ItemsByLang } from "@/lib/items";
 import type { LangCode } from "@/lib/langs";
 import { db } from "@/lib/firebase";
 import { sendEmail } from "@/lib/gmail";
