@@ -1,8 +1,10 @@
 "use client";
 
 import { useAuth } from "./AuthProvider";
+import { DEFAULT_LANG, type LangCode } from "@/lib/langs";
+import { LOGIN_COPY } from "@/lib/loginCopy";
 
-export default function LoginButton() {
+export default function LoginButton({ lang = DEFAULT_LANG }: { lang?: LangCode }) {
   const { user, loading, login, logout } = useAuth();
 
   if (loading) return null;
@@ -34,9 +36,10 @@ export default function LoginButton() {
   return (
     <button
       onClick={handleLogin}
+      lang={lang}
       className="w-full max-w-[280px] px-6 py-3 bg-[#0071e3] text-white text-[15px] font-medium rounded-xl hover:bg-[#0077ED] active:scale-[0.98] transition-all"
     >
-      Google로 로그인
+      {LOGIN_COPY[lang].login}
     </button>
   );
 }

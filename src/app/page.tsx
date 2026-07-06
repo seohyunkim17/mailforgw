@@ -7,6 +7,7 @@ import Stats from "@/components/Stats";
 import MailtoFallback from "@/components/MailtoFallback";
 import { useAuth } from "@/components/AuthProvider";
 import { LANGS, DEFAULT_LANG, isLangCode, type LangCode } from "@/lib/langs";
+import { LOGIN_COPY } from "@/lib/loginCopy";
 
 function isInAppBrowser(): boolean {
   if (typeof window === "undefined") return false;
@@ -87,15 +88,31 @@ export default function Home() {
           </div>
         ) : (
           <div className="mt-8 w-full max-w-[280px] flex flex-col items-center">
-            <LoginButton />
-            <div className="mt-2 w-full">
-              <MailtoFallback />
+            <div className="w-full flex gap-1 bg-[#f0f0f5] rounded-xl p-1 mb-4">
+              {LANGS.map((l) => (
+                <button
+                  key={l.code}
+                  onClick={() => changeLang(l.code)}
+                  lang={l.code}
+                  className={`flex-1 py-1.5 rounded-[9px] text-[12px] font-medium transition-all ${
+                    lang === l.code
+                      ? "bg-[#1d1d1f] text-white"
+                      : "text-[#86868b] active:scale-[0.97]"
+                  }`}
+                >
+                  {l.label}
+                </button>
+              ))}
             </div>
-            <p className="mt-6 text-[11px] text-[#4b4b4b] text-center underline underline-offset-2">
-              반드시 Safari, Chrome 등으로 접속해주세요 (트위터 X)
+            <LoginButton lang={lang} />
+            <div className="mt-2 w-full">
+              <MailtoFallback lang={lang} />
+            </div>
+            <p lang={lang} className="mt-6 text-[11px] text-[#4b4b4b] text-center underline underline-offset-2">
+              {LOGIN_COPY[lang].browserNotice}
             </p>
-            <p className="mt-2 text-[11px] text-[#aeaeb2] text-center leading-relaxed">
-              본 서비스는 개인 의견 전달을 위한 메일 간편 발송 서비스입니다.<br />로그인 시 이에 동의하며, 악의적으로 사용하지 않을 것을<br />약속하는 것으로 간주됩니다.
+            <p lang={lang} className="mt-2 text-[11px] text-[#aeaeb2] text-center leading-relaxed whitespace-pre-line">
+              {LOGIN_COPY[lang].disclaimer}
             </p>
           </div>
         )}
