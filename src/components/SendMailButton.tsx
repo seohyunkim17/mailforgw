@@ -48,9 +48,6 @@ const SendMailButton = forwardRef<SendMailHandle, SendMailButtonProps>(
   const [previewBody, setPreviewBody] = useState("");
   const [dataLoaded, setDataLoaded] = useState(false);
 
-  const curSubjects = itemsByLang[lang].subjects;
-  const curBodies = itemsByLang[lang].bodies;
-
   const fetchData = useCallback(async () => {
     try {
       const data = await fetchItems();
