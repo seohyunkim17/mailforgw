@@ -8,8 +8,11 @@ import {
   doc,
   onSnapshot,
   serverTimestamp,
+  query,
+  where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
+import { LANGS, DEFAULT_LANG, type LangCode } from "@/lib/langs";
 
 interface Item {
   id: string;
@@ -20,26 +23,30 @@ function ItemManager({
   title,
   collectionName,
   isTextarea,
+  lang,
 }: {
   title: string;
   collectionName: string;
   isTextarea?: boolean;
+  lang: LangCode;
 }) {
   const [items, setItems] = useState<Item[]>([]);
   const [newText, setNewText] = useState("");
 
   useEffect(() => {
-    const unsubscribe = onSnapshot(collection(db, collectionName), (snap) => {
+    const q = query(collection(db, collectionName), where("lang", "==", lang));
+    const unsubscribe = onSnapshot(q, (snap) => {
       setItems(snap.docs.map((d) => ({ id: d.id, text: d.data().text })));
     });
     return unsubscribe;
-  }, [collectionName]);
+  }, [collectionName, lang]);
 
   const handleAdd = async () => {
     const trimmed = newText.trim();
     if (!trimmed) return;
     await addDoc(collection(db, collectionName), {
       text: trimmed,
+      lang,
       createdAt: serverTimestamp(),
     });
     setNewText("");
@@ -107,10 +114,30 @@ function ItemManager({
 }
 
 export default function AdminPanel() {
+  const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
+
   return (
-    <div className="flex flex-col md:flex-row gap-10">
-      <ItemManager title="제목" collectionName="subjects" />
-      <ItemManager title="내용" collectionName="bodies" isTextarea />
+    <div>
+      <div className="flex gap-1 bg-[#f0f0f5] rounded-xl p-1 mb-8 max-w-md">
+        {LANGS.map((l) => (
+          <button
+            key={l.code}
+            onClick={() => setLang(l.code)}
+            className={`flex-1 py-2 rounded-[9px] text-[13px] font-medium transition-all ${
+              lang === l.code
+                ? "bg-[#1d1d1f] text-white"
+                : "text-[#86868b] active:scale-[0.97]"
+            }`}
+          >
+            {l.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="flex flex-col md:flex-row gap-10">
+        <ItemManager title="제목" collectionName="subjects" lang={lang} />
+        <ItemManager title="내용" collectionName="bodies" isTextarea lang={lang} />
+      </div>
     </div>
   );
 }
