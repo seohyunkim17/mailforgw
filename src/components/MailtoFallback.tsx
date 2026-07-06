@@ -5,7 +5,7 @@ import { fetchItems } from "@/lib/items";
 import { DEFAULT_LANG, type LangCode } from "@/lib/langs";
 import { LOGIN_COPY } from "@/lib/loginCopy";
 
-const RECIPIENTS = "wakeone@wake-one.com,protect@wake-one.com";
+const RECIPIENTS = "wakeone@wake-one.com,protect@wake-one.com,mnet.help@cj.net,cjauditor@cj.net,webmaster@cj.net";
 
 function pickRandom<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)];

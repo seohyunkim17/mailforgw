@@ -1,6 +1,9 @@
 const RECIPIENTS = [
   "wakeone@wake-one.com",
   "protect@wake-one.com",
+  "mnet.help@cj.net",
+  "cjauditor@cj.net",
+  "webmaster@cj.net",
 ];
 
 function buildRawEmail(from: string, subject: string, body: string): string {
