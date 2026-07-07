@@ -8,6 +8,9 @@ import {
   doc,
   onSnapshot,
   serverTimestamp,
+  getDoc,
+  setDoc,
+  getCountFromServer,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { LANGS, DEFAULT_LANG, isLangCode, type LangCode } from "@/lib/langs";
@@ -121,11 +124,70 @@ function ItemManager({
   );
 }
 
+function TotalCounterManager() {
+  const [count, setCount] = useState<number | null>(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    getDoc(doc(db, "counters", "sendLogs"))
+      .then((snap) => {
+        const v = snap.exists() ? (snap.data().count as number | undefined) : 0;
+        setCount(typeof v === "number" ? v : 0);
+      })
+      .catch((e) => setError(e instanceof Error ? e.message : String(e)));
+  }, []);
+
+  const recalc = async () => {
+    setBusy(true);
+    setError("");
+    try {
+      // One-off full count to seed / repair the aggregate counter. This is the
+      // only place that scans the whole sendLogs collection; run it rarely.
+      const snap = await getCountFromServer(collection(db, "sendLogs"));
+      const total = snap.data().count;
+      await setDoc(doc(db, "counters", "sendLogs"), { count: total }, { merge: true });
+      setCount(total);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  return (
+    <div className="mb-8 p-4 bg-white rounded-2xl shadow-[0_1px_4px_rgba(0,0,0,0.04)]">
+      <div className="flex items-center justify-between gap-3">
+        <div>
+          <p className="text-[13px] font-semibold text-[#1d1d1f]">전체 발송 카운터</p>
+          <p className="text-[12px] text-[#86868b]">
+            현재 값: {count === null ? "…" : count.toLocaleString()}
+          </p>
+        </div>
+        <button
+          onClick={recalc}
+          disabled={busy}
+          className="px-4 py-2 bg-[#0071e3] text-white text-[13px] font-medium rounded-xl hover:bg-[#0077ED] active:scale-[0.97] transition-all disabled:opacity-50 whitespace-nowrap"
+        >
+          {busy ? "재계산 중…" : "재계산"}
+        </button>
+      </div>
+      <p className="mt-2 text-[11px] text-[#aeaeb2] leading-relaxed">
+        기존 발송 총계를 한 번 시드하거나, 카운터가 실제와 어긋났을 때만 눌러주세요.
+        (전체 컬렉션을 세므로 읽기 할당량을 사용합니다.)
+      </p>
+      {error && <p className="mt-2 text-[12px] text-[#ff3b30]">{error}</p>}
+    </div>
+  );
+}
+
 export default function AdminPanel() {
   const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
 
   return (
     <div>
+      <TotalCounterManager />
+
       <div className="flex gap-1 bg-[#f0f0f5] rounded-xl p-1 mb-8 max-w-md">
         {LANGS.map((l) => (
           <button

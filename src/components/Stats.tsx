@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { collection, getCountFromServer, query, where, Timestamp } from "firebase/firestore";
+import { collection, getCountFromServer, getDoc, doc, query, where, Timestamp } from "firebase/firestore";
 import { db } from "@/lib/firebase";
 import { useAuth } from "./AuthProvider";
 
@@ -52,10 +52,14 @@ export default function Stats() {
 
     const fetchTotal = async () => {
       try {
-        const snap = await getCountFromServer(collection(db, "sendLogs"));
-        setTotalCount(snap.data().count);
+        // Single-document read of the aggregate counter, instead of counting
+        // the whole sendLogs collection on every page load (which billed
+        // ceil(N/1000) reads per view and burned the free-tier read quota).
+        const snap = await getDoc(doc(db, "counters", "sendLogs"));
+        const value = snap.exists() ? (snap.data().count as number | undefined) : 0;
+        setTotalCount(typeof value === "number" ? value : 0);
       } catch (e) {
-        console.error("[Stats] failed to count total sends:", e);
+        console.error("[Stats] failed to read total counter:", e);
         // Leave as null (renders "–") rather than a misleading 0.
         setTotalCount(null);
       }

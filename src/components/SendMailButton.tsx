@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from "react";
-import { collection, getDocs, addDoc, Timestamp, query, where } from "firebase/firestore";
+import { collection, addDoc, Timestamp, query, where, doc, setDoc, increment, getCountFromServer } from "firebase/firestore";
 import { fetchItems, emptyItemsByLang, type ItemsByLang } from "@/lib/items";
 import type { LangCode } from "@/lib/langs";
 import { db } from "@/lib/firebase";
@@ -131,10 +131,19 @@ const SendMailButton = forwardRef<SendMailHandle, SendMailButtonProps>(
                 email: user.email,
                 sentAt: Timestamp.now(),
               });
+              // Maintain an aggregate counter so the "전체" total can be read
+              // with a single document read instead of counting the whole
+              // sendLogs collection on every page load. `increment` on a
+              // merge-set creates the doc at 1 if it doesn't exist yet.
+              await setDoc(
+                doc(db, "counters", "sendLogs"),
+                { count: increment(1) },
+                { merge: true }
+              );
               window.dispatchEvent(new Event("mail-sent"));
             } catch { /* non-critical */ }
 
-            // Check daily limit
+            // Check daily limit (count aggregation = 1 read, not up to 500)
             try {
               const todayMidnight = getTodayMidnightKST();
               const myQ = query(
@@ -142,8 +151,8 @@ const SendMailButton = forwardRef<SendMailHandle, SendMailButtonProps>(
                 where("userId", "==", user.uid),
                 where("sentAt", ">=", Timestamp.fromDate(todayMidnight))
               );
-              const snap = await getDocs(myQ);
-              if (snap.size >= 500) {
+              const snap = await getCountFromServer(myQ);
+              if (snap.data().count >= 500) {
                 setShowLimitPopup(true);
               }
             } catch { /* ignore */ }
