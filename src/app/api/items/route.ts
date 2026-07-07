@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getAdminDb } from "@/lib/firebase-admin";
-import { LANG_CODES, isLangCode, type LangCode } from "@/lib/langs";
+import { LANG_CODES, isLangCode, DEFAULT_LANG, type LangCode } from "@/lib/langs";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,21 +31,21 @@ export async function GET() {
     ]);
 
     const result = emptyByLang();
+    // Legacy docs created before the per-language feature have no `lang`
+    // field. Treat those as the default language so they don't disappear.
     for (const d of sSnap.docs) {
       const data = d.data();
       const text = data.text as string | undefined;
-      const lang = data.lang as string | undefined;
-      if (typeof text === "string" && isLangCode(lang)) {
-        result[lang].subjects.push(text);
-      }
+      if (typeof text !== "string") continue;
+      const lang = isLangCode(data.lang) ? data.lang : DEFAULT_LANG;
+      result[lang].subjects.push(text);
     }
     for (const d of bSnap.docs) {
       const data = d.data();
       const text = data.text as string | undefined;
-      const lang = data.lang as string | undefined;
-      if (typeof text === "string" && isLangCode(lang)) {
-        result[lang].bodies.push(text);
-      }
+      if (typeof text !== "string") continue;
+      const lang = isLangCode(data.lang) ? data.lang : DEFAULT_LANG;
+      result[lang].bodies.push(text);
     }
 
     return NextResponse.json(result, {

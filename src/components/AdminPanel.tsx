@@ -8,11 +8,9 @@ import {
   doc,
   onSnapshot,
   serverTimestamp,
-  query,
-  where,
 } from "firebase/firestore";
 import { db } from "@/lib/firebase";
-import { LANGS, DEFAULT_LANG, type LangCode } from "@/lib/langs";
+import { LANGS, DEFAULT_LANG, isLangCode, type LangCode } from "@/lib/langs";
 
 interface Item {
   id: string;
@@ -34,9 +32,19 @@ function ItemManager({
   const [newText, setNewText] = useState("");
 
   useEffect(() => {
-    const q = query(collection(db, collectionName), where("lang", "==", lang));
-    const unsubscribe = onSnapshot(q, (snap) => {
-      setItems(snap.docs.map((d) => ({ id: d.id, text: d.data().text })));
+    // Read the whole collection and bucket client-side. Legacy docs created
+    // before the per-language feature have no `lang` field; treat those as the
+    // default language so they remain visible and manageable.
+    const unsubscribe = onSnapshot(collection(db, collectionName), (snap) => {
+      setItems(
+        snap.docs
+          .filter((d) => {
+            const raw = d.data().lang;
+            const docLang = isLangCode(raw) ? raw : DEFAULT_LANG;
+            return docLang === lang;
+          })
+          .map((d) => ({ id: d.id, text: d.data().text }))
+      );
     });
     return unsubscribe;
   }, [collectionName, lang]);
