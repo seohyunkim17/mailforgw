@@ -15,9 +15,23 @@ function isInAppBrowser(): boolean {
   return /KAKAOTALK|NAVER|Instagram|FBAN|FBAV|Line|DaumApps|everytimeApp/i.test(ua);
 }
 
+// Firestore 무료 할당량이 태평양 자정에 리셋되므로, 그 직후인 KST 오후 5시 10분까지는
+// 로그인 대신 점검 안내를 노출한다. 이 시각이 지나면 자동으로 원래 화면으로 복구된다.
+const MAINTENANCE_UNTIL = new Date("2026-07-07T17:10:00+09:00").getTime();
+
 export default function Home() {
   const { user, loading } = useAuth();
   const [lang, setLang] = useState<LangCode>(DEFAULT_LANG);
+
+  const [locked, setLocked] = useState(() => Date.now() < MAINTENANCE_UNTIL);
+
+  useEffect(() => {
+    if (!locked) return;
+    const id = setInterval(() => {
+      if (Date.now() >= MAINTENANCE_UNTIL) setLocked(false);
+    }, 15000);
+    return () => clearInterval(id);
+  }, [locked]);
 
   useEffect(() => {
     try {
@@ -52,6 +66,23 @@ export default function Home() {
     const interval = setInterval(updateBtn, 100);
     return () => clearInterval(interval);
   }, [updateBtn]);
+
+  if (locked) {
+    return (
+      <main className="min-h-screen flex flex-col items-center justify-center bg-[#fbfbfd] px-6 text-center">
+        <h1 className="text-[28px] font-semibold tracking-tight text-[#1d1d1f]">
+          to wakeone
+        </h1>
+        <p className="mt-6 text-[15px] font-medium text-[#1d1d1f]">
+          일시적으로 서비스 이용이 제한되고 있습니다.
+        </p>
+        <p className="mt-2 text-[13px] text-[#86868b] leading-relaxed max-w-[300px]">
+          데이터베이스 일일 사용량 한도로 잠시 중단되었습니다.<br />
+          오후 5시 10분(KST) 이후 자동으로 복구됩니다.
+        </p>
+      </main>
+    );
+  }
 
   if (loading) {
     return (
