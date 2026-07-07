@@ -28,7 +28,13 @@ export default function Stats() {
 
   useEffect(() => {
     if (!user) return;
-    const fetchCounts = async () => {
+
+    // Count the two independently: a failure of one (e.g. a missing composite
+    // index on the per-user query) must not silently zero out the other.
+    // Surface errors to the console instead of masking them as 0, so a blocked
+    // read (rules / index / wrong project) is diagnosable rather than looking
+    // like "no data".
+    const fetchMy = async () => {
       try {
         const todayMidnight = getTodayMidnightKST();
         const myQ = query(
@@ -36,28 +42,37 @@ export default function Stats() {
           where("userId", "==", user.uid),
           where("sentAt", ">=", Timestamp.fromDate(todayMidnight))
         );
-        const [mySnap, totalSnap] = await Promise.all([
-          getCountFromServer(myQ),
-          getCountFromServer(collection(db, "sendLogs")),
-        ]);
-        setMyCount(mySnap.data().count);
-        setTotalCount(totalSnap.data().count);
-      } catch {
+        const snap = await getCountFromServer(myQ);
+        setMyCount(snap.data().count);
+      } catch (e) {
+        console.error("[Stats] failed to count today's sends:", e);
         setMyCount(0);
-        setTotalCount(0);
       }
     };
-    fetchCounts();
+
+    const fetchTotal = async () => {
+      try {
+        const snap = await getCountFromServer(collection(db, "sendLogs"));
+        setTotalCount(snap.data().count);
+      } catch (e) {
+        console.error("[Stats] failed to count total sends:", e);
+        // Leave as null (renders "–") rather than a misleading 0.
+        setTotalCount(null);
+      }
+    };
+
+    fetchMy();
+    fetchTotal();
 
     const handler = () => {
       setMyCount((prev) => (prev === null ? 1 : prev + 1));
-      setTotalCount((prev) => (prev === null ? 1 : prev + 1));
+      setTotalCount((prev) => (prev === null ? prev : prev + 1));
     };
     window.addEventListener("mail-sent", handler);
     return () => window.removeEventListener("mail-sent", handler);
   }, [user]);
 
-  if (!user || myCount === null || totalCount === null) return null;
+  if (!user || myCount === null) return null;
 
   return (
     <div className="w-full max-w-[420px] h-[72px] flex items-center justify-center">
@@ -71,7 +86,7 @@ export default function Stats() {
           <span className="text-[#aeaeb2]">내 1일 잔여</span>
         </div>
         <div className="flex flex-col items-center">
-          <span className="text-[17px] font-semibold text-[#86868b]">{formatCount(totalCount)}</span>
+          <span className="text-[17px] font-semibold text-[#86868b]">{totalCount === null ? "–" : formatCount(totalCount)}</span>
           <span className="text-[#aeaeb2]">전체</span>
         </div>
       </div>
